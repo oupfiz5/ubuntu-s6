@@ -251,10 +251,12 @@ UBUNTU_VERSION='20.04'
   # shell_check.sh \
   # dockerfilecheck.sh \
 
+  echo "Shellcheck main files"
   LC_ALL=C.UTF-8 shellcheck "${targets[@]}"
 
   # VERSION were exclude from main check (above)
   # exclude warning https://github.com/koalaman/shellcheck/wiki/SC2034
+  echo "Shellcheck VERSION"
   LC_ALL=C.UTF-8 shellcheck --shell=sh --exclude=SC2034 VERSION
 
   exit $?
@@ -410,7 +412,7 @@ Round-trips: 1   Artifacts sent: 6  received: 0
 Fill commit mesage above:
 #+name: commit-message
 #+begin_src org :tangle no
-  ci: added shellcheck for version file
+  ci: added output for shellcheck
 #+end_src
 
   #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
@@ -423,3 +425,14 @@ Fill commit mesage above:
     echo "fossil git export ..."
     fossil git export
   #+end_src
+
+  #+RESULTS:
+  : Sat 19 Jun 2021 09:48:44 AM MSK
+  : Branch is add-shellchecks
+  :
+  : fossil commit -m ...
+  : ./org/core.org contains mixed line endings. Use --no-warnings or the "crlf-glob" setting to disable this warning.
+  : Commit anyhow (a=all/c=convert/y/N)?
+  :
+  : fossil git export ...
+  : no changes
