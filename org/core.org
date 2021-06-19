@@ -224,7 +224,7 @@ UBUNTU_VERSION='20.04'
   ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-amd64.tar.gz /tmp/s6-overlay.tar.gz
 
   # * Run
-  # hadolint ignore=DL3003,DL3008
+  # hadolint ignore=DL3008,DL3003
   RUN apt-get update && \
       DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata --no-install-recommends && \
       apt-get clean && \
@@ -311,7 +311,7 @@ UBUNTU_VERSION='20.04'
 
 
     # * Pull hadolint and check targets
-    docker run --rm -i hadolint/hadolint < "${targets[@]}"
+    docker run --rm -i hadolint/hadolint < "${targets[@]}" && echo "success"
 
     exit $?
 #+end_src
@@ -418,7 +418,7 @@ Round-trips: 1   Artifacts sent: 6  received: 0
 Fill commit mesage above:
 #+name: commit-message
 #+begin_src org :tangle no
-  ci(dockerfile): ignored warning DL3003,DL3008
+  ci: added output for check dockerfile
 #+end_src
 
   #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
@@ -433,7 +433,7 @@ Fill commit mesage above:
   #+end_src
 
   #+RESULTS:
-  : Sat 19 Jun 2021 09:06:54 PM MSK
+  : Sat 19 Jun 2021 09:13:15 PM MSK
   : Branch is add-shellchecks
   :
   : fossil commit -m ...

@@ -14,6 +14,6 @@ done < <(
 
 
 # * Pull hadolint and check targets
-docker run --rm -i hadolint/hadolint < "${targets[@]}"
+docker run --rm -i hadolint/hadolint < "${targets[@]}" && echo "success"
 
 exit $?
