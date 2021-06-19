@@ -34,6 +34,7 @@ COPY rootfs/ /
 ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-amd64.tar.gz /tmp/s6-overlay.tar.gz
 
 # * Run
+# hadolint ignore=DL3003,DL3008
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata --no-install-recommends && \
     apt-get clean && \
