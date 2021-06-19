@@ -164,12 +164,17 @@ UBUNTU_VERSION='20.04'
         - name: Repo checkout
           uses: actions/checkout@v2
 
-        - name: Run shellcheck
+        - name: Check shell files (shellcheck)
           run: |
             sudo apt-get update -y
             sudo apt-get install shellcheck
             cd src
             ./shellcheck.sh
+
+        - name: Check dockerfile (hadolint)
+          run: |
+            cd src
+            ./dockerfile_check.sh
 
 #+end_src
 ** ../.github/.trigger_on_push :code:
@@ -412,7 +417,7 @@ Round-trips: 1   Artifacts sent: 6  received: 0
 Fill commit mesage above:
 #+name: commit-message
 #+begin_src org :tangle no
-  ci: added output for shellcheck
+  ci: added check for dockerfile (hadolint)
 #+end_src
 
   #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
@@ -427,7 +432,7 @@ Fill commit mesage above:
   #+end_src
 
   #+RESULTS:
-  : Sat 19 Jun 2021 09:48:44 AM MSK
+  : Sat 19 Jun 2021 08:47:06 PM MSK
   : Branch is add-shellchecks
   :
   : fossil commit -m ...

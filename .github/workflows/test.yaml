@@ -12,9 +12,14 @@ jobs:
       - name: Repo checkout
         uses: actions/checkout@v2
 
-      - name: Run shellcheck
+      - name: Check shell files (shellcheck)
         run: |
           sudo apt-get update -y
           sudo apt-get install shellcheck
           cd src
           ./shellcheck.sh
+
+      - name: Check dockerfile (hadolint)
+        run: |
+          cd src
+          ./dockerfile_check.sh
