@@ -1,0 +1,20 @@
+name: Tests
+
+# * Controls
+# Controls when the action will run.
+on: [push, pull_request, workflow_dispatch]
+
+# * Jobs
+jobs:
+  checks:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Repo checkout
+        uses: actions/checkout@v2
+
+      - name: Run shellcheck
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install shellcheck
+          cd src
+          ./shellcheck.sh

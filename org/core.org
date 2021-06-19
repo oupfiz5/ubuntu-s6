@@ -23,14 +23,15 @@ If you are reading this on GitHub, then you are looking at a Git mirror of the s
   - [[#general-options][General options]]
   - [[#timezone][Timezone]]
 - [[#cicd][CI/CD]]
-- [[#maintenance][Maintenance]]
+- [[#troubleshooting][Troubleshooting]]
   - [[#log-output][Log output]]
   - [[#shell-access][Shell access]]
 - [[#code][Code]]
   - [[#version][VERSION]]
-  - [[#githubworkflowson-pushyaml][.github/workflows/on-push.yaml]]
-  - [[#githubtrigger_on_push][.github/.trigger_on_push]]
-  - [[#gitignore][.gitignore]]
+  - [[#githubworkflowson-pushyaml][../.github/workflows/on-push.yaml]]
+  - [[#githubworkflowstestyaml][../.github/workflows/test.yaml]]
+  - [[#githubtrigger_on_push][../.github/.trigger_on_push]]
+  - [[#gitignore][../.gitignore]]
   - [[#dockerfile][Dockerfile]]
   - [[#shellchecksh][shellcheck.sh]]
   - [[#docker_image_checksh][docker_image_check.sh]]
@@ -86,7 +87,7 @@ docker run -itd --restart always \
 
 * CI/CD
 For  build and push docker images we use  [[https://github.com/oupfiz5/ubuntu-s6/blob/master/.github/workflows/on-push.yaml][Github Actions workflow]]. Flow process is [[https://guides.github.com/introduction/flow/][GitHub flow]].
-* Maintenance
+* Troubleshooting
 ** Log output
 For debugging and maintenance purposes you may want access the output log. If you are using Docker version 1.3.0 or higher you can access a running containers shell by starting bash using docker interactive:
 
@@ -107,7 +108,7 @@ docker exec -it ubuntu-s6 /bin/bash
 S6_OVERLAY_VERSION=2.2.0.3
 UBUNTU_VERSION=20.04
 #+end_src
-** .github/workflows/on-push.yaml :code:
+** ../.github/workflows/on-push.yaml :code:
 #+begin_src yaml :shebang ""
   name: Build and push docker images
 
@@ -147,11 +148,35 @@ UBUNTU_VERSION=20.04
             ./push.sh
 #+end_src
 
-** .github/.trigger_on_push :code:
-#+begin_src sh :shebang ""
-  Trigger:4
+** ../.github/workflows/test.yaml :code:
+#+begin_src yaml :shebang ""
+  name: Tests
+
+  # * Controls
+  # Controls when the action will run.
+  on: [push, pull_request, workflow_dispatch]
+
+  # * Jobs
+  jobs:
+    checks:
+      runs-on: ubuntu-20.04
+      steps:
+        - name: Repo checkout
+          uses: actions/checkout@v2
+
+        - name: Run shellcheck
+          run: |
+            sudo apt-get update -y
+            sudo apt-get install shellcheck
+            cd src
+            ./shellcheck.sh
+
 #+end_src
-** .gitignore :code:
+** ../.github/.trigger_on_push :code:
+#+begin_src sh :shebang ""
+  Trigger:1
+#+end_src
+** ../.gitignore :code:
 #+begin_src sh :shebang ""
   .fslckout
   .projectile
@@ -380,7 +405,7 @@ Round-trips: 1   Artifacts sent: 6  received: 0
 Fill commit mesage above:
 #+name: commit-message
 #+begin_src org :tangle no
-  docs: updated docs
+  docs: added workflow test.yaml (shellcheck)
 #+end_src
 
   #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
