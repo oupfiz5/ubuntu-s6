@@ -1,5 +1,5 @@
 #!/bin/bash
-# shellcheck source=../VERSION
+# shellcheck disable=SC1091
 set -a; source ../VERSION ; set +a;
 
 docker build \
