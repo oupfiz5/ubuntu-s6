@@ -35,6 +35,7 @@ If you are reading this on GitHub, then you are looking at a Git mirror of the s
   - [[#dockerfile][Dockerfile]]
   - [[#shellchecksh][shellcheck.sh]]
   - [[#docker_image_checksh][docker_image_check.sh]]
+  - [[#dockleignore][.dockleignore]]
   - [[#dockerfile_checksh][dockerfile_check.sh]]
   - [[#hookbuildsh][hook/build.sh]]
   - [[#hookpushsh][hook/push.sh]]
@@ -270,29 +271,32 @@ UBUNTU_VERSION='20.04'
 
 ** docker_image_check.sh :code:
 #+begin_src sh
-    set -e
+  set -e
+  IMAGE_NAME="${1}"
 
-    # * Get list of targets
-    targets=()
-    while IFS=  read -r -d $'\0'; do
-        targets+=("$REPLY")
-    done < <(
-      find \
-         Dockerfile \
-        -type f \
-        -print0
-      )
-
-
-    # * Install dockle and check targets
-    VERSION=$(
-        curl --silent "https://api.github.com/repos/goodwithtech/dockle/releases/latest" | \
-            grep '"tag_name":' | \
-            sed -E 's/.*"v([^"]+)".*/\1/' \
-           ) && docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
-                       goodwithtech/dockle:v"${VERSION}" "${targets[@]}"
-
-    exit $?
+  # * Install dockle and check targets
+  # Pay attention: some checks are ignored using .dockleignore
+  VERSION=$(
+      curl --silent "https://api.github.com/repos/goodwithtech/dockle/releases/latest" | \
+          grep '"tag_name":' | \
+          sed -E 's/.*"v([^"]+)".*/\1/' \
+         ) && docker run --rm \
+                         -v /var/run/docker.sock:/var/run/docker.sock \
+                         -v $(pwd)/.dockleignore:/.dockleignore \
+                         goodwithtech/dockle:v"${VERSION}" \
+                         --exit-code 1 \
+                         --exit-level fatal \
+                         "${IMAGE_NAME}"
+  exit $?
+#+end_src
+** .dockleignore :code:
+#+begin_src sh :shebang ""
+# Use COPY instead of ADD in Dockerfile because need to add s6-overlay from urlencode
+CIS-DI-0009
+# Use latest tag because to check the image inside only
+DKL-DI-0006
+# set root to default user because it will be use for next build
+CIS-DI-0001
 #+end_src
 ** dockerfile_check.sh :code:
 #+begin_src sh
@@ -418,7 +422,7 @@ Round-trips: 1   Artifacts sent: 6  received: 0
 Fill commit mesage above:
 #+name: commit-message
 #+begin_src org :tangle no
-  ci: added output for check dockerfile
+  ci(docker_image_check.sh ): binded .dockleignore in dockler
 #+end_src
 
   #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
@@ -433,7 +437,7 @@ Fill commit mesage above:
   #+end_src
 
   #+RESULTS:
-  : Sat 19 Jun 2021 09:13:15 PM MSK
+  : Sun 20 Jun 2021 01:57:05 PM MSK
   : Branch is add-shellchecks
   :
   : fossil commit -m ...
