@@ -17,6 +17,7 @@ done < <(
 # shell_check.sh \
 # dockerfilecheck.sh \
 
+ls -la
 echo "Shellcheck main files"
 LC_ALL=C.UTF-8 shellcheck "${targets[@]}"
 

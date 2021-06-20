@@ -239,7 +239,7 @@ UBUNTU_VERSION='20.04'
   ENTRYPOINT ["/init"]
 #+end_src
 ** shellcheck.sh :code:
-#+begin_src sh
+#+begin_src sh :results output pp :noweb strip-export :dir ../src
   set -e
 
   targets=()
@@ -258,6 +258,7 @@ UBUNTU_VERSION='20.04'
   # shell_check.sh \
   # dockerfilecheck.sh \
 
+  ls -la
   echo "Shellcheck main files"
   LC_ALL=C.UTF-8 shellcheck "${targets[@]}"
 
@@ -270,9 +271,9 @@ UBUNTU_VERSION='20.04'
 #+end_src
 
 ** docker_image_check.sh :code:
-#+begin_src sh
+#+begin_src sh :results output pp :noweb strip-export :dir ../src
   set -e
-  IMAGE_NAME="${1}"
+  IMAGE_NAME="${1:-oupfiz5/ubuntu-s6:latest}"
 
   # * Install dockle and check targets
   # Pay attention: some checks are ignored using .dockleignore
@@ -290,8 +291,6 @@ UBUNTU_VERSION='20.04'
   exit $?
 #+end_src
 
-#+RESULTS:
-
 ** .dockleignore :code:
 #+begin_src sh :shebang ""
 # Use COPY instead of ADD in Dockerfile because need to add s6-overlay from urlencode
@@ -302,7 +301,7 @@ DKL-DI-0006
 CIS-DI-0001
 #+end_src
 ** dockerfile_check.sh :code:
-#+begin_src sh
+#+begin_src sh :results output pp :noweb strip-export :dir ../src
     set -e
 
     # * Get list of targets
@@ -322,6 +321,10 @@ CIS-DI-0001
 
     exit $?
 #+end_src
+
+#+RESULTS:
+: success
+
 ** hook/build.sh :code:
 #+begin_src sh
   # shellcheck disable=SC1091
@@ -425,7 +428,7 @@ Round-trips: 1   Artifacts sent: 6  received: 0
 Fill commit mesage above:
 #+name: commit-message
 #+begin_src org :tangle no
-  ci(docker_image_check.sh ): quoted $(pwd) for prevent word splitting
+  ci: added .dockleignore file
 #+end_src
 
   #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
@@ -440,7 +443,7 @@ Fill commit mesage above:
   #+end_src
 
   #+RESULTS:
-  : Sun 20 Jun 2021 02:01:58 PM MSK
+  : Sun 20 Jun 2021 03:41:27 PM MSK
   : Branch is add-shellchecks
   :
   : fossil commit -m ...

@@ -1,38 +1,38 @@
 # Table of Contents
 
--   [About](#org421b239)
--   [Installation](#orgde7df28)
-    -   [Download from dockerhub](#org89f4af2)
-    -   [Build from chiselapp (fossil)](#orga358a97)
-    -   [Build from github](#orgfa898df)
--   [Configuration options](#org618c10f)
-    -   [General options](#org581bd51)
-    -   [Timezone](#orgb1e2202)
--   [CI/CD](#org4be944d)
--   [Troubleshooting](#org73517e8)
-    -   [Log output](#org77d5089)
-    -   [Shell access](#org2394c63)
--   [Code](#org13adaf0):code:
-    -   [VERSION](#orgfa3d024):code:
-    -   [../.github/workflows/on-push.yaml](#orge82bef1):code:
-    -   [../.github/workflows/test.yaml](#org532570e):code:
-    -   [../.github/.trigger\_on\_push](#org344ea45):code:
-    -   [../.gitignore](#org5aff2d4):code:
-    -   [Dockerfile](#org2b40a07):code:
-    -   [shellcheck.sh](#org37d12bf):code:
-    -   [docker\_image\_check.sh](#org0e36d1c):code:
-    -   [.dockleignore](#org34cd3b5):code:
-    -   [dockerfile\_check.sh](#org34862e5):code:
-    -   [hook/build.sh](#org6000938):code:
-    -   [hook/push.sh](#orgb708ae5):code:
-    -   [rootfs/etc/cont-finish.d/.gitignore](#org05a7d8f):code:notangle:
-    -   [rootfs/etc/cont-init.d/00\_settimezone.sh](#org2a5444a):code:
-    -   [rootfs/etc/fix-attrs.d/.gitignore](#org3bdf1b0):code:notangle:
-    -   [rootfs/etc/services.d/.gitignore](#org4b2b324):code:notangle:
+-   [About](#org061d8ad)
+-   [Installation](#org04494fb)
+    -   [Download from dockerhub](#org9baa11c)
+    -   [Build from chiselapp (fossil)](#orgdc7cd85)
+    -   [Build from github](#org0deb270)
+-   [Configuration options](#orgca51922)
+    -   [General options](#org4e3c4e0)
+    -   [Timezone](#org2020554)
+-   [CI/CD](#org5205c66)
+-   [Troubleshooting](#orgc54611f)
+    -   [Log output](#org05e81f2)
+    -   [Shell access](#orge440993)
+-   [Code](#orgff37e75):code:
+    -   [VERSION](#orge90f897):code:
+    -   [../.github/workflows/on-push.yaml](#org073c992):code:
+    -   [../.github/workflows/test.yaml](#org124973c):code:
+    -   [../.github/.trigger\_on\_push](#org77f300e):code:
+    -   [../.gitignore](#orgb72ff77):code:
+    -   [Dockerfile](#org536153a):code:
+    -   [shellcheck.sh](#orge611c12):code:
+    -   [docker\_image\_check.sh](#org9d92166):code:
+    -   [.dockleignore](#org9086bd2):code:
+    -   [dockerfile\_check.sh](#orgfff8dae):code:
+    -   [hook/build.sh](#org536ae6f):code:
+    -   [hook/push.sh](#org275cca7):code:
+    -   [rootfs/etc/cont-finish.d/.gitignore](#org19678b6):code:notangle:
+    -   [rootfs/etc/cont-init.d/00\_settimezone.sh](#org2816c05):code:
+    -   [rootfs/etc/fix-attrs.d/.gitignore](#org655cd09):code:notangle:
+    -   [rootfs/etc/services.d/.gitignore](#orgb63e0f6):code:notangle:
 
 
 
-<a id="org421b239"></a>
+<a id="org061d8ad"></a>
 
 # About
 
@@ -43,12 +43,12 @@ Ubuntu-s6 is self-hosting at <https://chiselapp.com/user/oupfiz5/repository/ubun
 If you are reading this on GitHub, then you are looking at a Git mirror of the self-hosting Ubuntu-s6 repository.  The purpose of that mirror is to test and exercise Fossil's ability to export a Git mirror and using Github CI/CD  (Github Actions). Nobody much uses the GitHub mirror, except to verify that the mirror logic works. If you want to know more about Ubuntu-s6, visit the official self-hosting site linked above.
 
 
-<a id="orgde7df28"></a>
+<a id="org04494fb"></a>
 
 # Installation
 
 
-<a id="org89f4af2"></a>
+<a id="org9baa11c"></a>
 
 ## Download from dockerhub
 
@@ -56,7 +56,7 @@ If you are reading this on GitHub, then you are looking at a Git mirror of the s
     docker pull oupfiz5/ubuntu-s6:20.04
 
 
-<a id="orga358a97"></a>
+<a id="orgdc7cd85"></a>
 
 ## Build from chiselapp (fossil)
 
@@ -67,7 +67,7 @@ If you are reading this on GitHub, then you are looking at a Git mirror of the s
     docker build -t oupfiz5/ubuntu-s6 .
 
 
-<a id="orgfa898df"></a>
+<a id="org0deb270"></a>
 
 ## Build from github
 
@@ -76,12 +76,12 @@ If you are reading this on GitHub, then you are looking at a Git mirror of the s
     docker build -t oupfiz5/ubuntu-s6 .
 
 
-<a id="org618c10f"></a>
+<a id="orgca51922"></a>
 
 # Configuration options
 
 
-<a id="org581bd51"></a>
+<a id="org4e3c4e0"></a>
 
 ## General options
 
@@ -113,7 +113,7 @@ If you are reading this on GitHub, then you are looking at a Git mirror of the s
 </table>
 
 
-<a id="orgb1e2202"></a>
+<a id="org2020554"></a>
 
 ## Timezone
 
@@ -126,19 +126,19 @@ timezone set the desired timezone with the variable TZ.
                oupfiz5/ubuntu-s6:latest
 
 
-<a id="org4be944d"></a>
+<a id="org5205c66"></a>
 
 # CI/CD
 
 For  build and push docker images we use  [Github Actions workflow](https://github.com/oupfiz5/ubuntu-s6/blob/master/.github/workflows/on-push.yaml). Flow process is [GitHub flow](https://guides.github.com/introduction/flow/).
 
 
-<a id="org73517e8"></a>
+<a id="orgc54611f"></a>
 
 # Troubleshooting
 
 
-<a id="org77d5089"></a>
+<a id="org05e81f2"></a>
 
 ## Log output
 
@@ -149,7 +149,7 @@ For debugging and maintenance purposes you may want access the output log. If yo
            oupfiz5/ubuntu-s6:latest
 
 
-<a id="org2394c63"></a>
+<a id="orge440993"></a>
 
 ## Shell access
 
@@ -158,12 +158,12 @@ For debugging and maintenance purposes you may want access the containers shell.
     docker exec -it ubuntu-s6 /bin/bash
 
 
-<a id="org13adaf0"></a>
+<a id="orgff37e75"></a>
 
 # Code     :code:
 
 
-<a id="orgfa3d024"></a>
+<a id="orge90f897"></a>
 
 ## VERSION     :code:
 
@@ -171,7 +171,7 @@ For debugging and maintenance purposes you may want access the containers shell.
     UBUNTU_VERSION='20.04'
 
 
-<a id="orge82bef1"></a>
+<a id="org073c992"></a>
 
 ## ../.github/workflows/on-push.yaml     :code:
 
@@ -213,7 +213,7 @@ For debugging and maintenance purposes you may want access the containers shell.
               ./push.sh
 
 
-<a id="org532570e"></a>
+<a id="org124973c"></a>
 
 ## ../.github/workflows/test.yaml     :code:
 
@@ -244,14 +244,14 @@ For debugging and maintenance purposes you may want access the containers shell.
               ./dockerfile_check.sh
 
 
-<a id="org344ea45"></a>
+<a id="org77f300e"></a>
 
 ## ../.github/.trigger\_on\_push     :code:
 
     Trigger:1
 
 
-<a id="org5aff2d4"></a>
+<a id="orgb72ff77"></a>
 
 ## ../.gitignore     :code:
 
@@ -259,7 +259,7 @@ For debugging and maintenance purposes you may want access the containers shell.
     .projectile
 
 
-<a id="org2b40a07"></a>
+<a id="org536153a"></a>
 
 ## Dockerfile     :code:
 
@@ -313,7 +313,7 @@ For debugging and maintenance purposes you may want access the containers shell.
     ENTRYPOINT ["/init"]
 
 
-<a id="org37d12bf"></a>
+<a id="orge611c12"></a>
 
 ## shellcheck.sh     :code:
 
@@ -335,6 +335,7 @@ For debugging and maintenance purposes you may want access the containers shell.
     # shell_check.sh \
     # dockerfilecheck.sh \
 
+    ls -la
     echo "Shellcheck main files"
     LC_ALL=C.UTF-8 shellcheck "${targets[@]}"
 
@@ -346,12 +347,12 @@ For debugging and maintenance purposes you may want access the containers shell.
     exit $?
 
 
-<a id="org0e36d1c"></a>
+<a id="org9d92166"></a>
 
 ## docker\_image\_check.sh     :code:
 
     set -e
-    IMAGE_NAME="${1}"
+    IMAGE_NAME="${1:-oupfiz5/ubuntu-s6:latest}"
 
     # * Install dockle and check targets
     # Pay attention: some checks are ignored using .dockleignore
@@ -369,7 +370,7 @@ For debugging and maintenance purposes you may want access the containers shell.
     exit $?
 
 
-<a id="org34cd3b5"></a>
+<a id="org9086bd2"></a>
 
 ## .dockleignore     :code:
 
@@ -381,7 +382,7 @@ For debugging and maintenance purposes you may want access the containers shell.
     CIS-DI-0001
 
 
-<a id="org34862e5"></a>
+<a id="orgfff8dae"></a>
 
 ## dockerfile\_check.sh     :code:
 
@@ -405,7 +406,7 @@ For debugging and maintenance purposes you may want access the containers shell.
     exit $?
 
 
-<a id="org6000938"></a>
+<a id="org536ae6f"></a>
 
 ## hook/build.sh     :code:
 
@@ -422,7 +423,7 @@ For debugging and maintenance purposes you may want access the containers shell.
             ../.
 
 
-<a id="orgb708ae5"></a>
+<a id="org275cca7"></a>
 
 ## hook/push.sh     :code:
 
@@ -433,12 +434,12 @@ For debugging and maintenance purposes you may want access the containers shell.
     docker push oupfiz5/ubuntu-s6:latest
 
 
-<a id="org05a7d8f"></a>
+<a id="org19678b6"></a>
 
 ## rootfs/etc/cont-finish.d/.gitignore     :code:notangle:
 
 
-<a id="org2a5444a"></a>
+<a id="org2816c05"></a>
 
 ## rootfs/etc/cont-init.d/00\_settimezone.sh     :code:
 
@@ -462,11 +463,11 @@ For debugging and maintenance purposes you may want access the containers shell.
     fi
 
 
-<a id="org3bdf1b0"></a>
+<a id="org655cd09"></a>
 
 ## rootfs/etc/fix-attrs.d/.gitignore     :code:notangle:
 
 
-<a id="org4b2b324"></a>
+<a id="orgb63e0f6"></a>
 
 ## rootfs/etc/services.d/.gitignore     :code:notangle:

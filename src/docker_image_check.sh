@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-IMAGE_NAME="${1}"
+IMAGE_NAME="${1:-oupfiz5/ubuntu-s6:latest}"
 
 # * Install dockle and check targets
 # Pay attention: some checks are ignored using .dockleignore
