@@ -428,7 +428,7 @@ Round-trips: 1   Artifacts sent: 6  received: 0
 Fill commit mesage above:
 #+name: commit-message
 #+begin_src org :tangle no
-  docs: deleted code section from readme.md
+  docs: updated readme.md
 #+end_src
 
   #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
@@ -443,12 +443,17 @@ Fill commit mesage above:
   #+end_src
 
   #+RESULTS:
-  : Sun 20 Jun 2021 03:49:37 PM MSK
-  : Branch is add-shellchecks
-  :
-  : fossil commit -m ...
-  : ./org/core.org contains mixed line endings. Use --no-warnings or the "crlf-glob" setting to disable this warning.
-  : Commit anyhow (a=all/c=convert/y/N)?
-  :
-  : fossil git export ...
-  : no changes
+  #+begin_example
+  Sun 20 Jun 2021 03:49:44 PM MSK
+  Branch is add-shellchecks
+
+  fossil commit -m ...
+  New_Version: 8167fb2ebb43edbe934ba97fe574dbe7b490e968a3d5523579fa370b7138c3aa
+
+  fossil git export ...
+  git fast-import --export-marks=.mirror_state/marks.txt --quiet --done
+  1/1      
+1 check-ins added to the /home/opsa/Projects/ubuntu-s6/.github-mirroring/ubuntu-s6.git
+  git update-ref "refs/heads/add-shellchecks" bbdb4feefacd4230bef0ad8b25bbf49aa2e5d1d9
+  git push --mirror https://oupfiz5@github.com/oupfiz5/ubuntu-s6.git
+  #+end_example
