@@ -282,13 +282,16 @@ UBUNTU_VERSION='20.04'
           sed -E 's/.*"v([^"]+)".*/\1/' \
          ) && docker run --rm \
                          -v /var/run/docker.sock:/var/run/docker.sock \
-                         -v $(pwd)/.dockleignore:/.dockleignore \
+                         -v "$(pwd)"/.dockleignore:/.dockleignore \
                          goodwithtech/dockle:v"${VERSION}" \
                          --exit-code 1 \
                          --exit-level fatal \
                          "${IMAGE_NAME}"
   exit $?
 #+end_src
+
+#+RESULTS:
+
 ** .dockleignore :code:
 #+begin_src sh :shebang ""
 # Use COPY instead of ADD in Dockerfile because need to add s6-overlay from urlencode
@@ -422,7 +425,7 @@ Round-trips: 1   Artifacts sent: 6  received: 0
 Fill commit mesage above:
 #+name: commit-message
 #+begin_src org :tangle no
-  ci(docker_image_check.sh ): binded .dockleignore in dockler
+  ci(docker_image_check.sh ): quoted $(pwd) for prevent word splitting
 #+end_src
 
   #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
@@ -437,7 +440,7 @@ Fill commit mesage above:
   #+end_src
 
   #+RESULTS:
-  : Sun 20 Jun 2021 01:57:05 PM MSK
+  : Sun 20 Jun 2021 02:01:58 PM MSK
   : Branch is add-shellchecks
   :
   : fossil commit -m ...

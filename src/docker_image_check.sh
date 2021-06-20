@@ -10,7 +10,7 @@ VERSION=$(
         sed -E 's/.*"v([^"]+)".*/\1/' \
        ) && docker run --rm \
                        -v /var/run/docker.sock:/var/run/docker.sock \
-                       -v $(pwd)/.dockleignore:/.dockleignore \
+                       -v "$(pwd)"/.dockleignore:/.dockleignore \
                        goodwithtech/dockle:v"${VERSION}" \
                        --exit-code 1 \
                        --exit-level fatal \
