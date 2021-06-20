@@ -428,7 +428,7 @@ Round-trips: 1   Artifacts sent: 6  received: 0
 Fill commit mesage above:
 #+name: commit-message
 #+begin_src org :tangle no
-  ci: added .dockleignore file
+  docs: deleted code section from readme.md
 #+end_src
 
   #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
@@ -443,7 +443,7 @@ Fill commit mesage above:
   #+end_src
 
   #+RESULTS:
-  : Sun 20 Jun 2021 03:41:27 PM MSK
+  : Sun 20 Jun 2021 03:49:37 PM MSK
   : Branch is add-shellchecks
   :
   : fossil commit -m ...
