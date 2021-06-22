@@ -3,16 +3,17 @@ name: Tests
 # * Controls
 # Controls when the action will run.
 on: [push, pull_request, workflow_dispatch]
-   paths:
-     - .github/workflows/*
-     - .github/*
-     - Dockerfile
-     - rootfs/*
-     - hook/*
+#    paths:
+#      - .github/workflows/*
+#      - .github/*
+#      - Dockerfile
+#      - rootfs/*
+#      - hook/*
 
 
-# * Jobs
-jobs:
+# # * Jobs
+# j
+obs:
   checks:
     name: Checks shell code and Dockerfile
     runs-on: ubuntu-20.04

@@ -150,16 +150,17 @@ UBUNTU_VERSION='20.04'
   # * Controls
   # Controls when the action will run.
   on: [push, pull_request, workflow_dispatch]
-     paths:
-       - .github/workflows/*
-       - .github/*
-       - Dockerfile
-       - rootfs/*
-       - hook/*
+  #    paths:
+  #      - .github/workflows/*
+  #      - .github/*
+  #      - Dockerfile
+  #      - rootfs/*
+  #      - hook/*
 
 
-  # * Jobs
-  jobs:
+  # # * Jobs
+  # j
+  obs:
     checks:
       name: Checks shell code and Dockerfile
       runs-on: ubuntu-20.04
@@ -518,15 +519,15 @@ Fill commit mesage above:
 
   #+RESULTS:
   #+begin_example
-  Tue 22 Jun 2021 11:18:34 PM MSK
+  Tue 22 Jun 2021 11:20:15 PM MSK
   Branch is add-shellchecks
 
   fossil commit -m ...
-  New_Version: a3bf39d9e9573495561568a7b0fe3ccaf91603e27a8afe38c2eb98f381260169
+  New_Version: 5b6bc6c992588d86fdf2960b422e7be2fc7b993c727510468b1d10e112ab3043
 
   fossil git export ...
   git fast-import --export-marks=.mirror_state/marks.txt --quiet --done
   1/1      1 check-ins added to the /home/opsa/Projects/ubuntu-s6/.github-mirroring/ubuntu-s6.git
-  git update-ref "refs/heads/add-shellchecks" 3fb21a8823c86461e4473620ea82b3143c341655
+  git update-ref "refs/heads/add-shellchecks" f5643b8a2ac88db00ac833cfa2e76b367468b453
   git push --mirror https://oupfiz5@github.com/oupfiz5/ubuntu-s6.git
   #+end_example
