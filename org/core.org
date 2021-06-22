@@ -538,15 +538,15 @@ Fill commit mesage above:
 
   #+RESULTS:
   #+begin_example
-  Tue 22 Jun 2021 11:24:06 PM MSK
+  Tue 22 Jun 2021 11:38:33 PM MSK
   Branch is add-shellchecks
 
   fossil commit -m ...
-  New_Version: fed587c616cf7d1c7688b760804d7613998b44a00766d709cfc260ddbb2a226f
+  New_Version: 8f7f6da32e48c6ab18a18ef5d8b2e125d9acd4bb3a1d926964770c32fe91742c
 
   fossil git export ...
   git fast-import --export-marks=.mirror_state/marks.txt --quiet --done
   1/1      1 check-ins added to the /home/opsa/Projects/ubuntu-s6/.github-mirroring/ubuntu-s6.git
-  git update-ref "refs/heads/add-shellchecks" 857cf3f3432a67efb16608695567b0f41f5844f5
+  git update-ref "refs/heads/add-shellchecks" f5ce2ffb22dd0bec99a08e7e7b0a2abf562596e4
   git push --mirror https://oupfiz5@github.com/oupfiz5/ubuntu-s6.git
   #+end_example
