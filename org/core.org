@@ -186,13 +186,10 @@ UBUNTU_VERSION='20.04'
           uses: actions/checkout@v2
 
         - name: Build image
-          # env:
-          #   DOCKER_CONTENT_TRUST: '1'
           run: |
             cd ${GITHUB_WORKSPACE}/src
             set -a; source VERSION ; set +a;
             docker build \
-            --disable-content-trust=false \
             --build-arg BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
             --build-arg S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION}" \
             --build-arg UBUNTU_VERSION="${UBUNTU_VERSION}" \
@@ -399,7 +396,7 @@ CIS-DI-0001
   set -a; source ../VERSION ; set +a;
 
   # CIS-DI-0005: Enable Content trust for Docker
-  export DOCKER_CONTENT_TRUST=1
+  # export DOCKER_CONTENT_TRUST=1
 
   docker build \
          --build-arg BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
@@ -419,7 +416,7 @@ CIS-DI-0001
   set -a; source ../VERSION ; set +a;
 
   # CIS-DI-0005: Enable Content trust for Docker
-  export DOCKER_CONTENT_TRUST=1
+  # export DOCKER_CONTENT_TRUST=1
 
   docker push oupfiz5/ubuntu-s6:"${UBUNTU_VERSION}"
   docker push oupfiz5/ubuntu-s6:latest
@@ -504,7 +501,7 @@ Round-trips: 1   Artifacts sent: 6  received: 0
 Fill commit mesage above:
 #+name: commit-message
 #+begin_src org :tangle no
-  ci: exported parameter DOCKER_CONTENT_TRUST=1 for CIS-DI-0005 enable Content trust for Docker
+  ci: disable parameter DOCKER_CONTENT_TRUST=1
 #+end_src
 
   #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
@@ -520,15 +517,15 @@ Fill commit mesage above:
 
   #+RESULTS:
   #+begin_example
-  Tue 22 Jun 2021 08:50:30 PM MSK
+  Tue 22 Jun 2021 08:51:11 PM MSK
   Branch is add-shellchecks
 
   fossil commit -m ...
-  New_Version: f7a2b4ad257aa73deef79946ae09083c3fd85487824113246c47b7cf908fc3cc
+  New_Version: b1fd89528aec62021dacf4ce9e5319f48d334cdb68b95aa7d31a7c720b7adb34
 
   fossil git export ...
   git fast-import --export-marks=.mirror_state/marks.txt --quiet --done
   1/1      1 check-ins added to the /home/opsa/Projects/ubuntu-s6/.github-mirroring/ubuntu-s6.git
-  git update-ref "refs/heads/add-shellchecks" a8a7dd8c08da7b6ba32faa43dc929be6a959edde
+  git update-ref "refs/heads/add-shellchecks" 765a419ff8c13774216682c55de70d254d87a9b9
   git push --mirror https://oupfiz5@github.com/oupfiz5/ubuntu-s6.git
   #+end_example
