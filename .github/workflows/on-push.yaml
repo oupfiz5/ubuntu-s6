@@ -21,10 +21,10 @@ jobs:
 
       - name: Build images
         run: |
-          cd ${GITHUB_WORKSPACE}/hook
+          cd ${GITHUB_WORKSPACE}/src/hook
           ./build.sh
 
       - name: Push images
         run: |
-          cd ${GITHUB_WORKSPACE}/hook
+          cd ${GITHUB_WORKSPACE}/src/hook
           ./push.sh

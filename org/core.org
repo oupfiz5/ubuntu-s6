@@ -134,12 +134,12 @@ UBUNTU_VERSION='20.04'
 
         - name: Build images
           run: |
-            cd ${GITHUB_WORKSPACE}/hook
+            cd ${GITHUB_WORKSPACE}/src/hook
             ./build.sh
 
         - name: Push images
           run: |
-            cd ${GITHUB_WORKSPACE}/hook
+            cd ${GITHUB_WORKSPACE}/src/hook
             ./push.sh
 #+end_src
 
@@ -500,9 +500,9 @@ Round-trips: 1   Artifacts sent: 6  received: 0
 
 ** Fossil. Merge to trunk.  + Git export :noexport:
 Fill commit mesage above:
-#+name: commit-message
+#+name: merge-commit-message
 #+begin_src org :tangle no
-  ci: fixed mistype in test.yaml
+  Merged branch add-shellchecks
 #+end_src
 
   #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
@@ -512,7 +512,7 @@ Fill commit mesage above:
     fossil checkout trunk
     fossil merge "${current_branch}"
     echo "fossil commit -m ..."
-    fossil commit -m "<<commit-message>>" --no-warnings --tag v0.0.1
+    fossil commit -m "<<merge-commit-message>>" --no-warnings --tag v0.0.1
     # echo ""
     echo "fossil git export ..."
     fossil git export
@@ -522,7 +522,7 @@ Fill commit mesage above:
 Fill commit mesage above:
 #+name: commit-message
 #+begin_src org :tangle no
-  docs: [skip ci] added new section merge to trunk
+  ci: [skip ci] changed on-push.yaml
 #+end_src
 
   #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
@@ -538,15 +538,15 @@ Fill commit mesage above:
 
   #+RESULTS:
   #+begin_example
-  Tue 22 Jun 2021 11:38:33 PM MSK
+  Tue 22 Jun 2021 11:40:21 PM MSK
   Branch is add-shellchecks
 
   fossil commit -m ...
-  New_Version: 8f7f6da32e48c6ab18a18ef5d8b2e125d9acd4bb3a1d926964770c32fe91742c
+  New_Version: 0087627a7f3369d3b25b6ae11a87ab2f0e885a31ad590edbd97908d3aca67f6d
 
   fossil git export ...
   git fast-import --export-marks=.mirror_state/marks.txt --quiet --done
   1/1      1 check-ins added to the /home/opsa/Projects/ubuntu-s6/.github-mirroring/ubuntu-s6.git
-  git update-ref "refs/heads/add-shellchecks" f5ce2ffb22dd0bec99a08e7e7b0a2abf562596e4
+  git update-ref "refs/heads/add-shellchecks" 928f298347599c6d6e84493c1d87a44d8fb67e55
   git push --mirror https://oupfiz5@github.com/oupfiz5/ubuntu-s6.git
   #+end_example
