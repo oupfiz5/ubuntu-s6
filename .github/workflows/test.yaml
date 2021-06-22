@@ -36,7 +36,6 @@ jobs:
         run: |
           cd ${GITHUB_WORKSPACE}/src
           set -a; source VERSION ; set +a;
-          export DOCKER_CONTENT_TRUST=1;
           docker build \
           --build-arg BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
           --build-arg S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION}" \
