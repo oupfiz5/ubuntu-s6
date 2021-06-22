@@ -34,7 +34,6 @@ jobs:
 
       - name: Build image
         env:
-          # CIS-DI-0005: Enable Content trust for Docker
           DOCKER_CONTENT_TRUST: 1
         run: |
           cd ${GITHUB_WORKSPACE}/src
@@ -46,6 +45,7 @@ jobs:
           -t "oupfiz5/ubuntu-s6:${{ github.sha }}" \
           -f ./Dockerfile \
           .
+
       - name: Check image (dockle)
         run: |
           cd ${GITHUB_WORKSPACE}/src

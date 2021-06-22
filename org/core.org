@@ -187,7 +187,6 @@ UBUNTU_VERSION='20.04'
 
         - name: Build image
           env:
-            # CIS-DI-0005: Enable Content trust for Docker
             DOCKER_CONTENT_TRUST: 1
           run: |
             cd ${GITHUB_WORKSPACE}/src
@@ -199,6 +198,7 @@ UBUNTU_VERSION='20.04'
             -t "oupfiz5/ubuntu-s6:${{ github.sha }}" \
             -f ./Dockerfile \
             .
+
         - name: Check image (dockle)
           run: |
             cd ${GITHUB_WORKSPACE}/src
@@ -339,20 +339,20 @@ UBUNTU_VERSION='20.04'
 [35mINFO[0m	- [36mCIS-DI-0006[0m: Add HEALTHCHECK instruction to the container image
         ,* not found HEALTHCHECK statement
 [35mINFO[0m	- [36mCIS-DI-0008[0m: Confirm safety of setuid/setgid files
-        ,* setuid file: urwxr-xr-x usr/bin/chsh
-        ,* setuid file: urwxr-xr-x usr/bin/passwd
-        ,* setuid file: urwxr-xr-x usr/bin/umount
-        ,* setgid file: grwxr-xr-x usr/bin/wall
-        ,* setuid file: urwxr-xr-x usr/bin/newgrp
-        ,* setgid file: grwxr-xr-x usr/bin/chage
-        ,* setuid file: urwxr-xr-x usr/bin/gpasswd
-        ,* setgid file: grwxr-xr-x usr/sbin/unix_chkpwd
-        ,* setuid file: urwxr-xr-x usr/bin/chfn
-        ,* setuid file: urwxr-xr-x usr/bin/s6-overlay-preinit
-        ,* setuid file: urwxr-xr-x usr/bin/mount
-        ,* setgid file: grwxr-xr-x usr/bin/expiry
-        ,* setuid file: urwxr-xr-x usr/bin/su
         ,* setgid file: grwxr-xr-x usr/sbin/pam_extrausers_chkpwd
+        ,* setgid file: grwxr-xr-x usr/bin/expiry
+        ,* setuid file: urwxr-xr-x usr/bin/passwd
+        ,* setuid file: urwxr-xr-x usr/bin/gpasswd
+        ,* setuid file: urwxr-xr-x usr/bin/chfn
+        ,* setuid file: urwxr-xr-x usr/bin/umount
+        ,* setgid file: grwxr-xr-x usr/sbin/unix_chkpwd
+        ,* setuid file: urwxr-xr-x usr/bin/s6-overlay-preinit
+        ,* setgid file: grwxr-xr-x usr/bin/chage
+        ,* setuid file: urwxr-xr-x usr/bin/mount
+        ,* setuid file: urwxr-xr-x usr/bin/chsh
+        ,* setgid file: grwxr-xr-x usr/bin/wall
+        ,* setuid file: urwxr-xr-x usr/bin/su
+        ,* setuid file: urwxr-xr-x usr/bin/newgrp
 [34mIGNORE[0m	- [36mCIS-DI-0001[0m: Create a user for the container
 [34mIGNORE[0m	- [36mCIS-DI-0009[0m: Use COPY instead of ADD in Dockerfile
 [34mIGNORE[0m	- [36mDKL-DI-0006[0m: Avoid latest tag
@@ -393,7 +393,7 @@ CIS-DI-0001
 : success
 
 ** hook/build.sh :code:
-#+begin_src sh
+#+begin_src sh  :results output pp :noweb strip-export :dir ../src/hook
   # shellcheck disable=SC1091
   set -a; source ../VERSION ; set +a;
 
@@ -410,8 +410,10 @@ CIS-DI-0001
           ../.
 #+end_src
 
+#+RESULTS:
+
 ** hook/push.sh :code:
-#+begin_src sh
+#+begin_src sh :results output pp :noweb strip-export :dir ../src/hook
   # shellcheck disable=SC1091
   set -a; source ../VERSION ; set +a;
 
@@ -509,14 +511,14 @@ Fill commit mesage above:
     echo "Branch is $(fossil branch current)"
     echo ""
     echo "fossil commit -m ..."
-    fossil commit -m "<<commit-message>>"
+    fossil commit -m "<<commit-message>>" --no-warnings
     echo ""
     echo "fossil git export ..."
     fossil git export
   #+end_src
 
   #+RESULTS:
-  : Tue 22 Jun 2021 07:29:16 PM MSK
+  : Tue 22 Jun 2021 08:20:48 PM MSK
   : Branch is add-shellchecks
   :
   : fossil commit -m ...
