@@ -11,9 +11,8 @@ on: [push, pull_request, workflow_dispatch]
 #      - hook/*
 
 
-# # * Jobs
-# j
-obs:
+# * Jobs
+jobs:
   checks:
     name: Checks shell code and Dockerfile
     runs-on: ubuntu-20.04
