@@ -160,6 +160,7 @@ UBUNTU_VERSION='20.04'
   # * Jobs
   jobs:
     checks:
+      name: Checks
       runs-on: ubuntu-20.04
       steps:
         - name: Repo checkout
@@ -187,7 +188,7 @@ UBUNTU_VERSION='20.04'
         - name: Build images
           run: |
             cd ${GITHUB_WORKSPACE}/src
-            set -a; source ../VERSION ; set +a;
+            set -a; source VERSION ; set +a;
             docker build \
             --build-arg BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
             --build-arg S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION}" \
@@ -463,7 +464,7 @@ Fill commit mesage above:
   #+end_src
 
   #+RESULTS:
-  : Tue 22 Jun 2021 08:05:39 AM MSK
+  : Tue 22 Jun 2021 08:07:30 AM MSK
   : Branch is add-shellchecks
   :
   : fossil commit -m ...
