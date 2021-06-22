@@ -498,11 +498,31 @@ Round-trips: 1   Artifacts sent: 6  received: 0
   Sync done, sent: 1699  received: 328  ip: 74.208.146.128
   #+end_example
 
-** Fossil. Commit + Git export :noexport:
+** Fossil. Merge to trunk.  + Git export :noexport:
 Fill commit mesage above:
 #+name: commit-message
 #+begin_src org :tangle no
   ci: fixed mistype in test.yaml
+#+end_src
+
+  #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
+    date
+    current_branch=$(fossil branch current)
+    echo "Branch is ${current_branch}"
+    fossil checkout trunk
+    fossil merge "${current_branch}"
+    echo "fossil commit -m ..."
+    fossil commit -m "<<commit-message>>" --no-warnings --tag v0.0.1
+    # echo ""
+    echo "fossil git export ..."
+    fossil git export
+  #+end_src
+
+** Fossil. Commit + Git export :noexport:
+Fill commit mesage above:
+#+name: commit-message
+#+begin_src org :tangle no
+  docs: [skip ci] added new section merge to trunk
 #+end_src
 
   #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
@@ -518,15 +538,15 @@ Fill commit mesage above:
 
   #+RESULTS:
   #+begin_example
-  Tue 22 Jun 2021 11:22:25 PM MSK
+  Tue 22 Jun 2021 11:24:06 PM MSK
   Branch is add-shellchecks
 
   fossil commit -m ...
-  New_Version: 32fa4c728f01b9fe14567a5cd153a962ba75fe79704d9cfafcea6e23c10830fe
+  New_Version: fed587c616cf7d1c7688b760804d7613998b44a00766d709cfc260ddbb2a226f
 
   fossil git export ...
   git fast-import --export-marks=.mirror_state/marks.txt --quiet --done
   1/1      1 check-ins added to the /home/opsa/Projects/ubuntu-s6/.github-mirroring/ubuntu-s6.git
-  git update-ref "refs/heads/add-shellchecks" 3d82dbc900dbadd1d8026a65417dc3c43bc0add1
+  git update-ref "refs/heads/add-shellchecks" 857cf3f3432a67efb16608695567b0f41f5844f5
   git push --mirror https://oupfiz5@github.com/oupfiz5/ubuntu-s6.git
   #+end_example
