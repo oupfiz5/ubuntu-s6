@@ -25,7 +25,7 @@ jobs:
           cd src
           ./dockerfile_check.sh
 
-  build:
+  build_docker_image:
     name: Build docker image
     runs-on: ubuntu-20.04
     steps:
@@ -46,6 +46,7 @@ jobs:
 
   docker_check:
     name: Checks docker image
+    needs: build_docker_image
     runs-on: ubuntu-20.04
     steps:
       - name: Repo checkout
@@ -54,4 +55,5 @@ jobs:
       - name: Check image (dockle)
         run: |
           cd ${GITHUB_WORKSPACE}/src
-          ./docker_image_check.sh oupfiz5/ubuntu-s6:${{ github.sha }}
+          docker image ps
+          ./docker_image_check.sh "oupfiz5/ubuntu-s6:${{ github.sha }}"
