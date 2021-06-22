@@ -2,20 +2,14 @@ name: Build and push docker images
 
 on:
   push:
-    paths:
-      - .github/workflows/on-push.yaml
-      - .github/.trigger_on_push
-      - Dockerfile
-      - rootfs/*
-      - hook/*
     branches:
-      - version-*
-      # - master
-
+      - master
+    tags:
+      - 'v*'
 
 jobs:
   build:
-    name: Build and push dockerhub
+    name: Build and push image to dockerhub
     runs-on: ubuntu-latest
     steps:
       - name: Repo checkout

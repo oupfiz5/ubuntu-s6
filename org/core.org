@@ -502,7 +502,7 @@ Round-trips: 1   Artifacts sent: 6  received: 0
 Fill commit mesage above:
 #+name: commit-message
 #+begin_src org :tangle no
-  ci: run test on changes
+  ci: added path in test.yaml
 #+end_src
 
   #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
@@ -518,15 +518,15 @@ Fill commit mesage above:
 
   #+RESULTS:
   #+begin_example
-  Tue 22 Jun 2021 08:55:23 PM MSK
+  Tue 22 Jun 2021 11:18:34 PM MSK
   Branch is add-shellchecks
 
   fossil commit -m ...
-  New_Version: 407675b629b1f95a84d53e8c794f19b0d0e8abeb40f00d85a08e798d12ea00d3
+  New_Version: a3bf39d9e9573495561568a7b0fe3ccaf91603e27a8afe38c2eb98f381260169
 
   fossil git export ...
   git fast-import --export-marks=.mirror_state/marks.txt --quiet --done
   1/1      1 check-ins added to the /home/opsa/Projects/ubuntu-s6/.github-mirroring/ubuntu-s6.git
-  git update-ref "refs/heads/add-shellchecks" 0119a39fc84d6e024bbf79e4e9e7ad8de7b12c5b
+  git update-ref "refs/heads/add-shellchecks" 3fb21a8823c86461e4473620ea82b3143c341655
   git push --mirror https://oupfiz5@github.com/oupfiz5/ubuntu-s6.git
   #+end_example

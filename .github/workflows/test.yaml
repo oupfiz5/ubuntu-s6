@@ -3,6 +3,13 @@ name: Tests
 # * Controls
 # Controls when the action will run.
 on: [push, pull_request, workflow_dispatch]
+   paths:
+     - .github/workflows/*
+     - .github/*
+     - Dockerfile
+     - rootfs/*
+     - hook/*
+
 
 # * Jobs
 jobs:
@@ -50,16 +57,16 @@ jobs:
           docker image ls
           ./docker_image_check.sh "oupfiz5/ubuntu-s6:${{ github.sha }}"
 
-  docker_check:
-    name: Checks docker image
-    needs: build_docker_image
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Repo checkout
-        uses: actions/checkout@v2
+  # docker_check:
+  #   name: Checks docker image
+  #   needs: build_docker_image
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Repo checkout
+  #       uses: actions/checkout@v2
 
-      - name: Check image (dockle)
-        run: |
-          cd ${GITHUB_WORKSPACE}/src
-          docker image ls
-          # ./docker_image_check.sh "oupfiz5/ubuntu-s6:${{ github.sha }}"
+  #     - name: Check image (dockle)
+  #       run: |
+  #         cd ${GITHUB_WORKSPACE}/src
+  #         docker image ls
+  #         # ./docker_image_check.sh "oupfiz5/ubuntu-s6:${{ github.sha }}"
