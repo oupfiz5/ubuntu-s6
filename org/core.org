@@ -191,9 +191,8 @@ UBUNTU_VERSION='20.04'
           run: |
             cd ${GITHUB_WORKSPACE}/src
             set -a; source VERSION ; set +a;
-            echo $DOCKER_CONTENT_TRUST
             docker build \
-            --disable-content-trust=false \
+            --disable-content-trust=true \
             --build-arg BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
             --build-arg S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION}" \
             --build-arg UBUNTU_VERSION="${UBUNTU_VERSION}" \
@@ -521,15 +520,15 @@ Fill commit mesage above:
 
   #+RESULTS:
   #+begin_example
-  Tue 22 Jun 2021 08:44:54 PM MSK
+  Tue 22 Jun 2021 08:48:46 PM MSK
   Branch is add-shellchecks
 
   fossil commit -m ...
-  New_Version: a0a32014e6f5583660528760599bc2f8f6395d6aac93ae7b80fb8627339b8d46
+  New_Version: 9c09d9f9350b4919a455f3a407f4839bd84f515149af1efc88edd0b55b6e3d56
 
   fossil git export ...
   git fast-import --export-marks=.mirror_state/marks.txt --quiet --done
   1/1      1 check-ins added to the /home/opsa/Projects/ubuntu-s6/.github-mirroring/ubuntu-s6.git
-  git update-ref "refs/heads/add-shellchecks" e6602f9c648717eea73cb84eb3651372668114bb
+  git update-ref "refs/heads/add-shellchecks" 1aa8718910228530dae1a104a47b2bdfb1fe443c
   git push --mirror https://oupfiz5@github.com/oupfiz5/ubuntu-s6.git
   #+end_example

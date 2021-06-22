@@ -38,9 +38,8 @@ jobs:
         run: |
           cd ${GITHUB_WORKSPACE}/src
           set -a; source VERSION ; set +a;
-          echo $DOCKER_CONTENT_TRUST
           docker build \
-          --disable-content-trust=false \
+          --disable-content-trust=true \
           --build-arg BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
           --build-arg S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION}" \
           --build-arg UBUNTU_VERSION="${UBUNTU_VERSION}" \
