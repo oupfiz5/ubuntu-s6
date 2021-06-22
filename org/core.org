@@ -185,7 +185,7 @@ UBUNTU_VERSION='20.04'
         - name: Repo checkout
           uses: actions/checkout@v2
 
-        - name: Build images
+        - name: Build image
           run: |
             cd ${GITHUB_WORKSPACE}/src
             set -a; source VERSION ; set +a;
@@ -193,9 +193,14 @@ UBUNTU_VERSION='20.04'
             --build-arg BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
             --build-arg S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION}" \
             --build-arg UBUNTU_VERSION="${UBUNTU_VERSION}" \
-            -t oupfiz5/ubuntu-s6:${{ github.sha }} \
+            -t "oupfiz5/ubuntu-s6:${{ github.sha }}" \
             -f ./Dockerfile \
             .
+        - name: Check image (dockle)
+          run: |
+            cd ${GITHUB_WORKSPACE}/src
+            docker image ls
+            ./docker_image_check.sh "oupfiz5/ubuntu-s6:${{ github.sha }}"
 
     docker_check:
       name: Checks docker image
@@ -209,7 +214,7 @@ UBUNTU_VERSION='20.04'
           run: |
             cd ${GITHUB_WORKSPACE}/src
             docker image ls
-            ./docker_image_check.sh "oupfiz5/ubuntu-s6:${{ github.sha }}"
+            # ./docker_image_check.sh "oupfiz5/ubuntu-s6:${{ github.sha }}"
 #+end_src
 ** ../.github/.trigger_on_push :code:
 #+begin_src sh :shebang ""
@@ -476,7 +481,7 @@ Fill commit mesage above:
   #+end_src
 
   #+RESULTS:
-  : Tue 22 Jun 2021 08:30:00 AM MSK
+  : Tue 22 Jun 2021 08:42:40 AM MSK
   : Branch is add-shellchecks
   :
   : fossil commit -m ...
