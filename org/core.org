@@ -186,6 +186,9 @@ UBUNTU_VERSION='20.04'
           uses: actions/checkout@v2
 
         - name: Build image
+          env:
+            # CIS-DI-0005: Enable Content trust for Docker
+            DOCKER_CONTENT_TRUST: 1
           run: |
             cd ${GITHUB_WORKSPACE}/src
             set -a; source VERSION ; set +a;
@@ -329,6 +332,32 @@ UBUNTU_VERSION='20.04'
   exit $?
 #+end_src
 
+#+RESULTS:
+#+begin_example
+[35mINFO[0m	- [36mCIS-DI-0005[0m: Enable Content trust for Docker
+        ,* export DOCKER_CONTENT_TRUST=1 before docker pull/build
+[35mINFO[0m	- [36mCIS-DI-0006[0m: Add HEALTHCHECK instruction to the container image
+        ,* not found HEALTHCHECK statement
+[35mINFO[0m	- [36mCIS-DI-0008[0m: Confirm safety of setuid/setgid files
+        ,* setuid file: urwxr-xr-x usr/bin/chsh
+        ,* setuid file: urwxr-xr-x usr/bin/passwd
+        ,* setuid file: urwxr-xr-x usr/bin/umount
+        ,* setgid file: grwxr-xr-x usr/bin/wall
+        ,* setuid file: urwxr-xr-x usr/bin/newgrp
+        ,* setgid file: grwxr-xr-x usr/bin/chage
+        ,* setuid file: urwxr-xr-x usr/bin/gpasswd
+        ,* setgid file: grwxr-xr-x usr/sbin/unix_chkpwd
+        ,* setuid file: urwxr-xr-x usr/bin/chfn
+        ,* setuid file: urwxr-xr-x usr/bin/s6-overlay-preinit
+        ,* setuid file: urwxr-xr-x usr/bin/mount
+        ,* setgid file: grwxr-xr-x usr/bin/expiry
+        ,* setuid file: urwxr-xr-x usr/bin/su
+        ,* setgid file: grwxr-xr-x usr/sbin/pam_extrausers_chkpwd
+[34mIGNORE[0m	- [36mCIS-DI-0001[0m: Create a user for the container
+[34mIGNORE[0m	- [36mCIS-DI-0009[0m: Use COPY instead of ADD in Dockerfile
+[34mIGNORE[0m	- [36mDKL-DI-0006[0m: Avoid latest tag
+#+end_example
+
 ** .dockleignore :code:
 #+begin_src sh :shebang ""
 # Use COPY instead of ADD in Dockerfile because need to add s6-overlay from urlencode
@@ -368,6 +397,9 @@ CIS-DI-0001
   # shellcheck disable=SC1091
   set -a; source ../VERSION ; set +a;
 
+  # CIS-DI-0005: Enable Content trust for Docker
+  export DOCKER_CONTENT_TRUST=1
+
   docker build \
          --build-arg BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
          --build-arg S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION}" \
@@ -382,6 +414,9 @@ CIS-DI-0001
 #+begin_src sh
   # shellcheck disable=SC1091
   set -a; source ../VERSION ; set +a;
+
+  # CIS-DI-0005: Enable Content trust for Docker
+  export DOCKER_CONTENT_TRUST=1
 
   docker push oupfiz5/ubuntu-s6:"${UBUNTU_VERSION}"
   docker push oupfiz5/ubuntu-s6:latest
@@ -466,7 +501,7 @@ Round-trips: 1   Artifacts sent: 6  received: 0
 Fill commit mesage above:
 #+name: commit-message
 #+begin_src org :tangle no
-  ci: checked docker image using dockle
+  ci: exported parameter DOCKER_CONTENT_TRUST=1 for CIS-DI-0005 enable Content trust for Docker
 #+end_src
 
   #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
@@ -481,7 +516,7 @@ Fill commit mesage above:
   #+end_src
 
   #+RESULTS:
-  : Tue 22 Jun 2021 08:42:40 AM MSK
+  : Tue 22 Jun 2021 07:29:16 PM MSK
   : Branch is add-shellchecks
   :
   : fossil commit -m ...
