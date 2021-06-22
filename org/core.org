@@ -463,7 +463,7 @@ Fill commit mesage above:
   #+end_src
 
   #+RESULTS:
-  : Sun 20 Jun 2021 04:02:49 PM MSK
+  : Tue 22 Jun 2021 08:03:38 AM MSK
   : Branch is add-shellchecks
   :
   : fossil commit -m ...
