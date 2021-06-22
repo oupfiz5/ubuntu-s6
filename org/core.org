@@ -518,6 +518,19 @@ Fill commit mesage above:
     fossil git export
   #+end_src
 
+** Fossil. Release tag  + Git export :noexport:
+Fill commit mesage above:
+#+name: tags-commit-message
+#+begin_src org :tangle no
+  v0.0.1
+#+end_src
+
+  #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
+    date
+    fossil commit -m "Release <<tags-commit-message>>" --no-warnings --tag <<tags-commit-message>>
+    echo "fossil git export ..."
+    fossil git export
+  #+end_src
 ** Fossil. Commit + Git export :noexport:
 Fill commit mesage above:
 #+name: commit-message
@@ -538,15 +551,15 @@ Fill commit mesage above:
 
   #+RESULTS:
   #+begin_example
-  Tue 22 Jun 2021 11:40:21 PM MSK
-  Branch is add-shellchecks
+  Tue 22 Jun 2021 11:51:13 PM MSK
+  Branch is trunk
 
   fossil commit -m ...
-  New_Version: 0087627a7f3369d3b25b6ae11a87ab2f0e885a31ad590edbd97908d3aca67f6d
+  New_Version: 811a53ea051d3df98497198def02c5aa16129adbbda52e5fb7302f355b046e80
 
   fossil git export ...
   git fast-import --export-marks=.mirror_state/marks.txt --quiet --done
   1/1      1 check-ins added to the /home/opsa/Projects/ubuntu-s6/.github-mirroring/ubuntu-s6.git
-  git update-ref "refs/heads/add-shellchecks" 928f298347599c6d6e84493c1d87a44d8fb67e55
+  git update-ref "refs/heads/master" 723f9712d8abc85e5cc1d054b91ea76e1738e7db
   git push --mirror https://oupfiz5@github.com/oupfiz5/ubuntu-s6.git
   #+end_example
