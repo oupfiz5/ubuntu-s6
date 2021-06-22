@@ -22,7 +22,7 @@ If you are reading this on GitHub, then you are looking at a Git mirror of the s
 - [[#configuration-options][Configuration options]]
   - [[#general-options][General options]]
   - [[#timezone][Timezone]]
-- [[#cicd][CI/CD]]
+- [[#continues-integration][Continues Integration]]
 - [[#troubleshooting][Troubleshooting]]
   - [[#log-output][Log output]]
   - [[#shell-access][Shell access]]
@@ -86,7 +86,7 @@ docker run -itd --restart always \
            oupfiz5/ubuntu-s6:latest
 #+end_example
 
-* CI/CD
+* Continues Integration
 For  build and push docker images we use  [[https://github.com/oupfiz5/ubuntu-s6/blob/master/.github/workflows/on-push.yaml][Github Actions workflow]]. Flow process is [[https://guides.github.com/introduction/flow/][GitHub flow]].
 * Troubleshooting
 ** Log output
@@ -176,6 +176,26 @@ UBUNTU_VERSION='20.04'
           run: |
             cd src
             ./dockerfile_check.sh
+
+    build:
+      name: Build docker image
+      runs-on: ubuntu-20.04
+      steps:
+        - name: Repo checkout
+          uses: actions/checkout@v2
+
+        - name: Build images
+          run: |
+            cd ${GITHUB_WORKSPACE}/src
+            set -a; source ../VERSION ; set +a;
+            docker build \
+            --build-arg BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+            --build-arg S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION}" \
+            --build-arg UBUNTU_VERSION="${UBUNTU_VERSION}" \
+           -t oupfiz5/ubuntu-s6:${{ github.sha }} \
+           -f ./Dockerfile \
+           .
+
 
 #+end_src
 ** ../.github/.trigger_on_push :code:
@@ -428,7 +448,7 @@ Round-trips: 1   Artifacts sent: 6  received: 0
 Fill commit mesage above:
 #+name: commit-message
 #+begin_src org :tangle no
-  docs: updated readme.md
+  ci: builded docker from test worklow
 #+end_src
 
   #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
