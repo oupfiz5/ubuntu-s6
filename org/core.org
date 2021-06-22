@@ -115,20 +115,14 @@ UBUNTU_VERSION='20.04'
 
   on:
     push:
-      paths:
-        - .github/workflows/on-push.yaml
-        - .github/.trigger_on_push
-        - Dockerfile
-        - rootfs/*
-        - hook/*
       branches:
-        - version-*
-        # - master
-
+        - master
+      tags:
+        - 'v*'
 
   jobs:
     build:
-      name: Build and push dockerhub
+      name: Build and push image to dockerhub
       runs-on: ubuntu-latest
       steps:
         - name: Repo checkout
@@ -156,6 +150,13 @@ UBUNTU_VERSION='20.04'
   # * Controls
   # Controls when the action will run.
   on: [push, pull_request, workflow_dispatch]
+     paths:
+       - .github/workflows/*
+       - .github/*
+       - Dockerfile
+       - rootfs/*
+       - hook/*
+
 
   # * Jobs
   jobs:
@@ -203,19 +204,19 @@ UBUNTU_VERSION='20.04'
             docker image ls
             ./docker_image_check.sh "oupfiz5/ubuntu-s6:${{ github.sha }}"
 
-    docker_check:
-      name: Checks docker image
-      needs: build_docker_image
-      runs-on: ubuntu-20.04
-      steps:
-        - name: Repo checkout
-          uses: actions/checkout@v2
+    # docker_check:
+    #   name: Checks docker image
+    #   needs: build_docker_image
+    #   runs-on: ubuntu-20.04
+    #   steps:
+    #     - name: Repo checkout
+    #       uses: actions/checkout@v2
 
-        - name: Check image (dockle)
-          run: |
-            cd ${GITHUB_WORKSPACE}/src
-            docker image ls
-            # ./docker_image_check.sh "oupfiz5/ubuntu-s6:${{ github.sha }}"
+    #     - name: Check image (dockle)
+    #       run: |
+    #         cd ${GITHUB_WORKSPACE}/src
+    #         docker image ls
+    #         # ./docker_image_check.sh "oupfiz5/ubuntu-s6:${{ github.sha }}"
 #+end_src
 ** ../.github/.trigger_on_push :code:
 #+begin_src sh :shebang ""
@@ -501,7 +502,7 @@ Round-trips: 1   Artifacts sent: 6  received: 0
 Fill commit mesage above:
 #+name: commit-message
 #+begin_src org :tangle no
-  ci: disable parameter DOCKER_CONTENT_TRUST=1
+  ci: run test on changes
 #+end_src
 
   #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
@@ -517,15 +518,15 @@ Fill commit mesage above:
 
   #+RESULTS:
   #+begin_example
-  Tue 22 Jun 2021 08:51:11 PM MSK
+  Tue 22 Jun 2021 08:55:23 PM MSK
   Branch is add-shellchecks
 
   fossil commit -m ...
-  New_Version: b1fd89528aec62021dacf4ce9e5319f48d334cdb68b95aa7d31a7c720b7adb34
+  New_Version: 407675b629b1f95a84d53e8c794f19b0d0e8abeb40f00d85a08e798d12ea00d3
 
   fossil git export ...
   git fast-import --export-marks=.mirror_state/marks.txt --quiet --done
   1/1      1 check-ins added to the /home/opsa/Projects/ubuntu-s6/.github-mirroring/ubuntu-s6.git
-  git update-ref "refs/heads/add-shellchecks" 765a419ff8c13774216682c55de70d254d87a9b9
+  git update-ref "refs/heads/add-shellchecks" 0119a39fc84d6e024bbf79e4e9e7ad8de7b12c5b
   git push --mirror https://oupfiz5@github.com/oupfiz5/ubuntu-s6.git
   #+end_example

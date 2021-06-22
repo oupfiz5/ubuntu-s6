@@ -1,21 +1,21 @@
 # Table of Contents
 
--   [About](#org18d6888)
--   [Installation](#orgcd2bcb4)
-    -   [Download from dockerhub](#org9f38419)
-    -   [Build from chiselapp (fossil)](#org8c45feb)
-    -   [Build from github](#org9217f71)
--   [Configuration options](#orga64d271)
-    -   [General options](#org4790f4a)
-    -   [Timezone](#org1bdbf71)
--   [Continues Integration](#org1f4fddc)
--   [Troubleshooting](#orge0fe9f1)
-    -   [Log output](#org36f8a88)
-    -   [Shell access](#org09c0b7d)
+-   [About](#org1867048)
+-   [Installation](#org390f490)
+    -   [Download from dockerhub](#orgc04a764)
+    -   [Build from chiselapp (fossil)](#orgcc82bfb)
+    -   [Build from github](#org87298f0)
+-   [Configuration options](#org9ada939)
+    -   [General options](#orgb4289c5)
+    -   [Timezone](#org8dab2f7)
+-   [Continues Integration](#org8ee1d61)
+-   [Troubleshooting](#orgba1daa5)
+    -   [Log output](#orgd1a3ab6)
+    -   [Shell access](#org307074b)
 
 
 
-<a id="org18d6888"></a>
+<a id="org1867048"></a>
 
 # About
 
@@ -26,12 +26,12 @@ Ubuntu-s6 is self-hosting at <https://chiselapp.com/user/oupfiz5/repository/ubun
 If you are reading this on GitHub, then you are looking at a Git mirror of the self-hosting Ubuntu-s6 repository.  The purpose of that mirror is to test and exercise Fossil's ability to export a Git mirror and using Github CI/CD  (Github Actions). Nobody much uses the GitHub mirror, except to verify that the mirror logic works. If you want to know more about Ubuntu-s6, visit the official self-hosting site linked above.
 
 
-<a id="orgcd2bcb4"></a>
+<a id="org390f490"></a>
 
 # Installation
 
 
-<a id="org9f38419"></a>
+<a id="orgc04a764"></a>
 
 ## Download from dockerhub
 
@@ -39,7 +39,7 @@ If you are reading this on GitHub, then you are looking at a Git mirror of the s
     docker pull oupfiz5/ubuntu-s6:20.04
 
 
-<a id="org8c45feb"></a>
+<a id="orgcc82bfb"></a>
 
 ## Build from chiselapp (fossil)
 
@@ -50,7 +50,7 @@ If you are reading this on GitHub, then you are looking at a Git mirror of the s
     docker build -t oupfiz5/ubuntu-s6 .
 
 
-<a id="org9217f71"></a>
+<a id="org87298f0"></a>
 
 ## Build from github
 
@@ -59,12 +59,12 @@ If you are reading this on GitHub, then you are looking at a Git mirror of the s
     docker build -t oupfiz5/ubuntu-s6 .
 
 
-<a id="orga64d271"></a>
+<a id="org9ada939"></a>
 
 # Configuration options
 
 
-<a id="org4790f4a"></a>
+<a id="orgb4289c5"></a>
 
 ## General options
 
@@ -96,7 +96,7 @@ If you are reading this on GitHub, then you are looking at a Git mirror of the s
 </table>
 
 
-<a id="org1bdbf71"></a>
+<a id="org8dab2f7"></a>
 
 ## Timezone
 
@@ -109,19 +109,19 @@ timezone set the desired timezone with the variable TZ.
                oupfiz5/ubuntu-s6:latest
 
 
-<a id="org1f4fddc"></a>
+<a id="org8ee1d61"></a>
 
 # Continues Integration
 
 For  build and push docker images we use  [Github Actions workflow](https://github.com/oupfiz5/ubuntu-s6/blob/master/.github/workflows/on-push.yaml). Flow process is [GitHub flow](https://guides.github.com/introduction/flow/).
 
 
-<a id="orge0fe9f1"></a>
+<a id="orgba1daa5"></a>
 
 # Troubleshooting
 
 
-<a id="org36f8a88"></a>
+<a id="orgd1a3ab6"></a>
 
 ## Log output
 
@@ -132,7 +132,7 @@ For debugging and maintenance purposes you may want access the output log. If yo
            oupfiz5/ubuntu-s6:latest
 
 
-<a id="org09c0b7d"></a>
+<a id="org307074b"></a>
 
 ## Shell access
 
