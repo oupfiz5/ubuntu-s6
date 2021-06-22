@@ -186,11 +186,10 @@ UBUNTU_VERSION='20.04'
           uses: actions/checkout@v2
 
         - name: Build image
-          env:
-            DOCKER_CONTENT_TRUST: 1
           run: |
             cd ${GITHUB_WORKSPACE}/src
             set -a; source VERSION ; set +a;
+            export DOCKER_CONTENT_TRUST=1;
             docker build \
             --build-arg BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
             --build-arg S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION}" \
@@ -518,12 +517,16 @@ Fill commit mesage above:
   #+end_src
 
   #+RESULTS:
-  : Tue 22 Jun 2021 08:20:48 PM MSK
-  : Branch is add-shellchecks
-  :
-  : fossil commit -m ...
-  : ./org/core.org contains mixed line endings. Use --no-warnings or the "crlf-glob" setting to disable this warning.
-  : Commit anyhow (a=all/c=convert/y/N)?
-  :
-  : fossil git export ...
-  : no changes
+  #+begin_example
+  Tue 22 Jun 2021 08:21:32 PM MSK
+  Branch is add-shellchecks
+
+  fossil commit -m ...
+  New_Version: a5ce856483437972344f3fe51f170caf8d62a5bef4437568a8b98abd0c18ff1f
+
+  fossil git export ...
+  git fast-import --export-marks=.mirror_state/marks.txt --quiet --done
+  1/1      1 check-ins added to the /home/opsa/Projects/ubuntu-s6/.github-mirroring/ubuntu-s6.git
+  git update-ref "refs/heads/add-shellchecks" d8337ce00fbd84e5850ae3b658b30c1e5f2ac121
+  git push --mirror https://oupfiz5@github.com/oupfiz5/ubuntu-s6.git
+  #+end_example
