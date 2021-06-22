@@ -55,5 +55,5 @@ jobs:
       - name: Check image (dockle)
         run: |
           cd ${GITHUB_WORKSPACE}/src
-          docker image ps
+          docker image ls
           ./docker_image_check.sh "oupfiz5/ubuntu-s6:${{ github.sha }}"

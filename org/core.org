@@ -208,7 +208,7 @@ UBUNTU_VERSION='20.04'
         - name: Check image (dockle)
           run: |
             cd ${GITHUB_WORKSPACE}/src
-            docker image ps
+            docker image ls
             ./docker_image_check.sh "oupfiz5/ubuntu-s6:${{ github.sha }}"
 #+end_src
 ** ../.github/.trigger_on_push :code:
@@ -476,7 +476,7 @@ Fill commit mesage above:
   #+end_src
 
   #+RESULTS:
-  : Tue 22 Jun 2021 08:28:21 AM MSK
+  : Tue 22 Jun 2021 08:30:00 AM MSK
   : Branch is add-shellchecks
   :
   : fossil commit -m ...
