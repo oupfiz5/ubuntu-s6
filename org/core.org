@@ -160,7 +160,7 @@ UBUNTU_VERSION='20.04'
   # * Jobs
   jobs:
     checks:
-      name: Checks
+      name: Checks shell code and Dockerfile
       runs-on: ubuntu-20.04
       steps:
         - name: Repo checkout
@@ -197,7 +197,17 @@ UBUNTU_VERSION='20.04'
             -f ./Dockerfile \
             .
 
+    docker_check:
+      name: Checks docker image
+      runs-on: ubuntu-20.04
+      steps:
+        - name: Repo checkout
+          uses: actions/checkout@v2
 
+        - name: Check image (dockle)
+          run: |
+            cd ${GITHUB_WORKSPACE}/src
+            ./docker_image_check.sh oupfiz5/ubuntu-s6:${{ github.sha }}
 #+end_src
 ** ../.github/.trigger_on_push :code:
 #+begin_src sh :shebang ""
@@ -449,7 +459,7 @@ Round-trips: 1   Artifacts sent: 6  received: 0
 Fill commit mesage above:
 #+name: commit-message
 #+begin_src org :tangle no
-  ci: builded docker from test worklow
+  ci: checked docker image using dockle
 #+end_src
 
   #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
@@ -464,7 +474,7 @@ Fill commit mesage above:
   #+end_src
 
   #+RESULTS:
-  : Tue 22 Jun 2021 08:07:30 AM MSK
+  : Tue 22 Jun 2021 08:19:20 AM MSK
   : Branch is add-shellchecks
   :
   : fossil commit -m ...

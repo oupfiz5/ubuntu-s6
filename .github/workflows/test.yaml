@@ -7,7 +7,7 @@ on: [push, pull_request, workflow_dispatch]
 # * Jobs
 jobs:
   checks:
-    name: Checks
+    name: Checks shell code and Dockerfile
     runs-on: ubuntu-20.04
     steps:
       - name: Repo checkout
@@ -43,3 +43,15 @@ jobs:
           -t oupfiz5/ubuntu-s6:${{ github.sha }} \
           -f ./Dockerfile \
           .
+
+  docker_check:
+    name: Checks docker image
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Repo checkout
+        uses: actions/checkout@v2
+
+      - name: Check image (dockle)
+        run: |
+          cd ${GITHUB_WORKSPACE}/src
+          ./docker_image_check.sh oupfiz5/ubuntu-s6:${{ github.sha }}
