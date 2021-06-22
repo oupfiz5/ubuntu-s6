@@ -33,9 +33,14 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build image
+        env:
+          FIRST_NAME: Mona
+          middle_name: The
+          Last_Name: Octocat
         run: |
           cd ${GITHUB_WORKSPACE}/src
           set -a; source VERSION ; set +a;
+          echo $Last_Name
           docker build \
           --build-arg BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
           --build-arg S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION}" \
