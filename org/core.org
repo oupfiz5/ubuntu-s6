@@ -176,17 +176,10 @@ UBUNTU_VERSION='20.04'
             cd src
             ./shellcheck.sh
 
-        - name: Check dockerfile (hadolint)
+        - name: Check Dockerfile (hadolint)
           run: |
             cd src
             ./dockerfile_check.sh
-
-    build_docker_image:
-      name: Build docker image
-      runs-on: ubuntu-20.04
-      steps:
-        - name: Repo checkout
-          uses: actions/checkout@v2
 
         - name: Build image
           run: |
@@ -208,7 +201,7 @@ UBUNTU_VERSION='20.04'
 
         - name: Check container
           run: |
-            cd ${GITHUB_WORKSPACE}/tests
+            cd ${GITHUB_WORKSPACE}
             docker run -d --rm --name=ubuntu-s6 "oupfiz5/ubuntu-s6:${{ github.sha }}"
             sleep 5
             docker container inspect ubuntu-s6
@@ -569,7 +562,7 @@ Fill commit mesage above:
 Fill commit mesage above:
 #+name: commit-message
 #+begin_src org :tangle no
-fix: added missed file .dockleignore
+ci(test): fixed test.yaml
 #+end_src
 
   #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
@@ -585,15 +578,15 @@ fix: added missed file .dockleignore
 
   #+RESULTS:
   #+begin_example
-  Fri 02 Jul 2021 11:49:43 PM MSK
+  Fri 02 Jul 2021 11:53:09 PM MSK
   Branch is check-container
 
   fossil commit -m ...
-  New_Version: 81fcf1519420bba1587fa5742d627787973db56b636e9cc1a0f7ba145e090371
+  New_Version: cae0096dcf69a5854c6451397647993cce6498899c45d00573acff06d8657be9
 
   fossil git export ...
   git fast-import --export-marks=.mirror_state/marks.txt --quiet --done
-  1/2      2/2      2 check-ins added to the /home/opsa/Projects/ubuntu-s6/.github-mirroring/ubuntu-s6.git
-  git update-ref "refs/heads/check-container" 307eba3511b865567043b27cb8ee96f9c63ee006
+  1/1      1 check-ins added to the /home/opsa/Projects/ubuntu-s6/.github-mirroring/ubuntu-s6.git
+  git update-ref "refs/heads/check-container" 162e83ea1ffc42d2696b746e0c7d3ffbd6658757
   git push --mirror https://oupfiz5@github.com/oupfiz5/ubuntu-s6.git
   #+end_example
