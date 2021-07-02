@@ -210,7 +210,7 @@ UBUNTU_VERSION='20.04'
           run: |
             cd ${GITHUB_WORKSPACE}/tests
             docker run -d --rm --name=ubuntu-s6 "oupfiz5/ubuntu-s6:${{ github.sha }}"
-            wait 5
+            sleep 5
             docker container inspect ubuntu-s6
             tests/.bats-battery/bats-core/bin/bats tests/
             docker container stop ubuntu-s6
@@ -584,10 +584,16 @@ fix: added missed file .dockleignore
   #+end_src
 
   #+RESULTS:
-  : Fri 02 Jul 2021 08:55:26 PM MSK
-  : Branch is check-container
-  :
-  : fossil commit -m ...
-  :
-  : fossil git export ...
-  : no changes
+  #+begin_example
+  Fri 02 Jul 2021 11:49:43 PM MSK
+  Branch is check-container
+
+  fossil commit -m ...
+  New_Version: 81fcf1519420bba1587fa5742d627787973db56b636e9cc1a0f7ba145e090371
+
+  fossil git export ...
+  git fast-import --export-marks=.mirror_state/marks.txt --quiet --done
+  1/2      2/2      2 check-ins added to the /home/opsa/Projects/ubuntu-s6/.github-mirroring/ubuntu-s6.git
+  git update-ref "refs/heads/check-container" 307eba3511b865567043b27cb8ee96f9c63ee006
+  git push --mirror https://oupfiz5@github.com/oupfiz5/ubuntu-s6.git
+  #+end_example

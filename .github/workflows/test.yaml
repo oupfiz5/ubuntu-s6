@@ -61,7 +61,7 @@ jobs:
         run: |
           cd ${GITHUB_WORKSPACE}/tests
           docker run -d --rm --name=ubuntu-s6 "oupfiz5/ubuntu-s6:${{ github.sha }}"
-          wait 5
+          sleep 5
           docker container inspect ubuntu-s6
           tests/.bats-battery/bats-core/bin/bats tests/
           docker container stop ubuntu-s6
