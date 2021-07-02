@@ -527,6 +527,10 @@ CIS-DI-0001
   #+end_src
 
   #+RESULTS:
+  : Fri 02 Jul 2021 11:48:42 PM MSK
+  : Branch is trunk
+  : fossil create new branch check-container
+  : New_Version: 121ee27242ff6801350ebe99b5aa93ef863805b44f1c51fb46e50863701589d7
 
 ** Fossil. Merge to trunk.  + Git export :noexport:
 Fill commit mesage above:
@@ -565,7 +569,7 @@ Fill commit mesage above:
 Fill commit mesage above:
 #+name: commit-message
 #+begin_src org :tangle no
-  ci(tests): added directory tests with bats file for image test
+fix: added missed file .dockleignore
 #+end_src
 
   #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
