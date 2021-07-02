@@ -163,7 +163,7 @@ UBUNTU_VERSION='20.04'
   # * Jobs
   jobs:
     checks:
-      name: Checks shell code and Dockerfile
+      name: Checks
       runs-on: ubuntu-20.04
       steps:
         - name: Repo checkout
@@ -201,11 +201,11 @@ UBUNTU_VERSION='20.04'
 
         - name: Check container
           run: |
-            cd ${GITHUB_WORKSPACE}
+            cd ${GITHUB_WORKSPACE}/tests
             docker run -d --rm --name=ubuntu-s6 "oupfiz5/ubuntu-s6:${{ github.sha }}"
             sleep 5
             docker container inspect ubuntu-s6
-            tests/.bats-battery/bats-core/bin/bats tests/
+            .bats-battery/bats-core/bin/bats .
             docker container stop ubuntu-s6
 #+end_src
 
@@ -458,47 +458,67 @@ CIS-DI-0001
 * Tests :test:
 ** 01.container.bats
 #+begin_src bats
-  @test "Verify state status container ubuntu-s6 (running)" {
-        run docker inspect --format 'result={{ .State.Status }}' "ubuntu-s6"
+
+  setup() {
+      export CONTAINER_NAME="ubuntu-s6"
+  }
+
+  @test "Verify state status container - running" {
+        sleep 5
+        run docker inspect --format 'result={{ .State.Status }}' "${CONTAINER_NAME}"
         assert_success
         assert_output 'result=running'
   }
 
-  @test "Verify state running container ubuntu-s6 (true)" {
-        run docker inspect --format 'result={{ .State.Running }}' "ubuntu-s6"
+  @test "Verify state running container - true" {
+        run docker inspect --format 'result={{ .State.Running }}' "${CONTAINER_NAME}"
         assert_success
         assert_output 'result=true'
   }
 
-  @test "Verify state restarting container ubuntu-s6 (false)" {
-        run docker inspect --format 'result={{ .State.Restarting }}' "ubuntu-s6"
+  @test "Verify state restarting container - false" {
+        run docker inspect --format 'result={{ .State.Restarting }}' "${CONTAINER_NAME}"
         assert_success
         assert_output 'result=false'
   }
 
-  @test "Verify state error container ubuntu-s6 ("")" {
-        run docker inspect --format 'result={{ .State.Error }}' "ubuntu-s6"
+  @test "Verify state error container - <empty>" {
+        run docker inspect --format 'result={{ .State.Error }}' "${CONTAINER_NAME}"
         assert_success
         assert_output 'result='
   }
 
-  @test "Verify restart count container ubuntu-s6 (0)" {
-        run docker inspect --format 'result={{ .RestartCount }}' "ubuntu-s6"
+  @test "Verify restart count container - 0" {
+        run docker inspect --format 'result={{ .RestartCount }}' "${CONTAINER_NAME}"
         assert_success
         assert_output 'result=0'
   }
 
-  @test "Verify AppArmor Profile, if applicable: ubuntu-s6" {
+  @test "Verify AppArmor Profile - if applicable" {
         skip
-        run docker inspect --format 'AppArmorProfile={{ .AppArmorProfile }}' "ubuntu-s6"
+        run docker inspect --format 'AppArmorProfile={{ .AppArmorProfile }}' "${CONTAINER_NAME}"
         assert_success
         refute_output "AppArmorProfile=[]"
         refute_output "AppArmorProfile="
         refute_output "AppArmorProfile=<no value>"
   }
+
+  @test "Verify container stop" {
+        run docker container stop "${CONTAINER_NAME}"
+        assert_success
+  }
+
 #+end_src
 
 #+RESULTS:
+: 1..7
+: ok 1 Verify state status container - running
+: ok 2 Verify state running container - true
+: ok 3 Verify state restarting container - false
+: ok 4 Verify state error container - <empty>
+: ok 5 Verify restart count container - 0
+: ok 6 Verify AppArmor Profile - if applicable # skip
+: ok 7 Verify container stop
 
 * Local hooks :noexport:
 
@@ -578,15 +598,15 @@ ci(test): fixed test.yaml
 
   #+RESULTS:
   #+begin_example
-  Fri 02 Jul 2021 11:53:09 PM MSK
+  Sat 03 Jul 2021 12:01:20 AM MSK
   Branch is check-container
 
   fossil commit -m ...
-  New_Version: cae0096dcf69a5854c6451397647993cce6498899c45d00573acff06d8657be9
+  New_Version: 1aca586925f8c3d56da1524764b39fd5fa9c489e02bb02bed83501697372455a
 
   fossil git export ...
   git fast-import --export-marks=.mirror_state/marks.txt --quiet --done
   1/1      1 check-ins added to the /home/opsa/Projects/ubuntu-s6/.github-mirroring/ubuntu-s6.git
-  git update-ref "refs/heads/check-container" 162e83ea1ffc42d2696b746e0c7d3ffbd6658757
+  git update-ref "refs/heads/check-container" daa2cee40c0e167767278f05c76c96cdab3fb447
   git push --mirror https://oupfiz5@github.com/oupfiz5/ubuntu-s6.git
   #+end_example

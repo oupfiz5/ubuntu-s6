@@ -14,7 +14,7 @@ on: [push, pull_request, workflow_dispatch]
 # * Jobs
 jobs:
   checks:
-    name: Checks shell code and Dockerfile
+    name: Checks
     runs-on: ubuntu-20.04
     steps:
       - name: Repo checkout
@@ -52,9 +52,9 @@ jobs:
 
       - name: Check container
         run: |
-          cd ${GITHUB_WORKSPACE}
+          cd ${GITHUB_WORKSPACE}/tests
           docker run -d --rm --name=ubuntu-s6 "oupfiz5/ubuntu-s6:${{ github.sha }}"
           sleep 5
           docker container inspect ubuntu-s6
-          tests/.bats-battery/bats-core/bin/bats tests/
+          .bats-battery/bats-core/bin/bats .
           docker container stop ubuntu-s6
