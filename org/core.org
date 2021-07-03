@@ -347,32 +347,6 @@ UBUNTU_VERSION='20.04'
   exit $?
 #+end_src
 
-#+RESULTS:
-#+begin_example
-[35mINFO[0m	- [36mCIS-DI-0005[0m: Enable Content trust for Docker
-        ,* export DOCKER_CONTENT_TRUST=1 before docker pull/build
-[35mINFO[0m	- [36mCIS-DI-0006[0m: Add HEALTHCHECK instruction to the container image
-        ,* not found HEALTHCHECK statement
-[35mINFO[0m	- [36mCIS-DI-0008[0m: Confirm safety of setuid/setgid files
-        ,* setgid file: grwxr-xr-x usr/sbin/pam_extrausers_chkpwd
-        ,* setgid file: grwxr-xr-x usr/bin/expiry
-        ,* setuid file: urwxr-xr-x usr/bin/passwd
-        ,* setuid file: urwxr-xr-x usr/bin/gpasswd
-        ,* setuid file: urwxr-xr-x usr/bin/chfn
-        ,* setuid file: urwxr-xr-x usr/bin/umount
-        ,* setgid file: grwxr-xr-x usr/sbin/unix_chkpwd
-        ,* setuid file: urwxr-xr-x usr/bin/s6-overlay-preinit
-        ,* setgid file: grwxr-xr-x usr/bin/chage
-        ,* setuid file: urwxr-xr-x usr/bin/mount
-        ,* setuid file: urwxr-xr-x usr/bin/chsh
-        ,* setgid file: grwxr-xr-x usr/bin/wall
-        ,* setuid file: urwxr-xr-x usr/bin/su
-        ,* setuid file: urwxr-xr-x usr/bin/newgrp
-[34mIGNORE[0m	- [36mCIS-DI-0001[0m: Create a user for the container
-[34mIGNORE[0m	- [36mCIS-DI-0009[0m: Use COPY instead of ADD in Dockerfile
-[34mIGNORE[0m	- [36mDKL-DI-0006[0m: Avoid latest tag
-#+end_example
-
 ** .dockleignore :code:
 #+begin_src sh :shebang ""
 # Use COPY instead of ADD in Dockerfile because need to add s6-overlay from urlencode
@@ -535,16 +509,6 @@ CIS-DI-0001
 
 #+end_src
 
-#+RESULTS:
-: 1..7
-: ok 1 Verify state status container - running
-: ok 2 Verify state running container - true
-: ok 3 Verify state restarting container - false
-: ok 4 Verify state error container - <empty>
-: ok 5 Verify restart count container - 0
-: ok 6 Verify AppArmor Profile - if applicable # skip
-: ok 7 Verify container stop
-
 * Local hooks :noexport:
 
 # Local Variables:
@@ -584,7 +548,7 @@ Fill commit mesage above:
     fossil checkout trunk
     fossil merge "${current_branch}"
     echo "fossil commit -m ..."
-    fossil commit -m "<<merge-commit-message>>" --no-warnings --tag v0.0.1
+    fossil commit -m "Merged branch ${current_branch}" --no-warnings --tag v0.0.1
     # echo ""
     echo "fossil git export ..."
     fossil git export
@@ -607,7 +571,7 @@ Fill commit mesage above:
 Fill commit mesage above:
 #+name: commit-message
 #+begin_src org :tangle no
-ci(test): updated on_push pipeline
+lp: updated  core.org
 #+end_src
 
   #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
@@ -620,18 +584,3 @@ ci(test): updated on_push pipeline
     echo "fossil git export ..."
     fossil git export
   #+end_src
-
-  #+RESULTS:
-  #+begin_example
-  Sat 03 Jul 2021 08:22:27 AM MSK
-  Branch is check-container
-
-  fossil commit -m ...
-  New_Version: ef0bca038ca37dc828cec2ea75ff263567a9e6d8e47f957b36a7e51be977436d
-
-  fossil git export ...
-  git fast-import --export-marks=.mirror_state/marks.txt --quiet --done
-  1/1      1 check-ins added to the /home/opsa/Projects/ubuntu-s6/.github-mirroring/ubuntu-s6.git
-  git update-ref "refs/heads/check-container" 8de41b9049d5994eabc6bf5afab75d51f19318a8
-  git push --mirror https://oupfiz5@github.com/oupfiz5/ubuntu-s6.git
-  #+end_example
