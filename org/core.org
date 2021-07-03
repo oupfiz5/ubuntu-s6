@@ -180,9 +180,10 @@ UBUNTU_VERSION='20.04'
 
   # * Environments
   env:
-    REPOSITORY: "oupfiz5"
+    CONTAINER_NAME: "ubuntu-s6"
     IMAGE_NAME: "ubuntu-s6"
     IMAGE_TAG: "${{ github.sha }}"
+    REPOSITORY: "oupfiz5"
 
   # * Jobs
   jobs:
@@ -226,7 +227,7 @@ UBUNTU_VERSION='20.04'
         - name: Check container
           run: |
             cd ${GITHUB_WORKSPACE}/tests
-            docker run -d --rm --name="${IMAGE_NAME}" "${REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}"
+            docker run -d --rm --name="${CONTAINER_NAME}" "${REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}"
             .bats-battery/bats-core/bin/bats .
 #+end_src
 
@@ -481,7 +482,7 @@ CIS-DI-0001
 #+begin_src bats
 
   setup() {
-      export CONTAINER_NAME="ubuntu-s6"
+      export CONTAINER_NAME="${CONTAINER_NAME:-ubuntu-s6}"
   }
 
   @test "Verify state status container - running" {
@@ -603,7 +604,7 @@ Fill commit mesage above:
 Fill commit mesage above:
 #+name: commit-message
 #+begin_src org :tangle no
-ci(test): updated container tests
+ci(test): updated test pipeline
 #+end_src
 
   #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
@@ -619,15 +620,15 @@ ci(test): updated container tests
 
   #+RESULTS:
   #+begin_example
-  Sat 03 Jul 2021 12:29:57 AM MSK
+  Sat 03 Jul 2021 08:11:19 AM MSK
   Branch is check-container
 
   fossil commit -m ...
-  New_Version: 3bc187f08af78629ae960fc4d6516d67efd38ba4545c361a46b32690abc25310
+  New_Version: a919b1fc5db2331cfc39b9f4646d4e7056beef9dd2d663eb72738fbd6f379e88
 
   fossil git export ...
   git fast-import --export-marks=.mirror_state/marks.txt --quiet --done
   1/1      1 check-ins added to the /home/opsa/Projects/ubuntu-s6/.github-mirroring/ubuntu-s6.git
-  git update-ref "refs/heads/check-container" e982ee167722abe20bc049dc879273edcf4e7acd
+  git update-ref "refs/heads/check-container" cbb6ec24e8d10a59b5b95fb1591eeb060f1565c1
   git push --mirror https://oupfiz5@github.com/oupfiz5/ubuntu-s6.git
   #+end_example

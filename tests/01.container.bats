@@ -2,7 +2,7 @@
 load './helpers.bash'
 
 setup() {
-    export CONTAINER_NAME="ubuntu-s6"
+    export CONTAINER_NAME="${CONTAINER_NAME:-ubuntu-s6}"
 }
 
 @test "Verify state status container - running" {
