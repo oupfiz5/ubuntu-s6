@@ -2,19 +2,44 @@ name: Tests
 
 # * Controls
 # Controls when the action will run.
-on: [push, pull_request, workflow_dispatch]
-#    paths:
-#      - .github/workflows/*
-#      - .github/*
-#      - Dockerfile
-#      - rootfs/*
-#      - hook/*
+on:
+  push:
+    paths:
+      - '.github/workflows/*'
+      - '.github/*'
+      - 'src/Dockerfile'
+      - 'src/rootfs/*'
+      - 'src/hook/*'
+      - 'src/*.sh'
+      - 'tests/**'
+    branches-ignore:
+      - 'master'
+      - 'main'
+  pull_request:
+    paths:
+      - '.github/workflows/*'
+      - '.github/*'
+      - 'src/Dockerfile'
+      - 'src/rootfs/*'
+      - 'src/hook/*'
+      - 'src/*.sh'
+      - 'tests/**'
+    branches-ignore:
+      - 'master'
+      - 'main'
+  workflow_dispatch:
 
+# * Environments
+env:
+  CONTAINER_NAME: "ubuntu-s6"
+  IMAGE_NAME: "ubuntu-s6"
+  IMAGE_TAG: "${{ github.sha }}"
+  REPOSITORY: "oupfiz5"
 
 # * Jobs
 jobs:
   checks:
-    name: Checks shell code and Dockerfile
+    name: Checks
     runs-on: ubuntu-20.04
     steps:
       - name: Repo checkout
@@ -27,17 +52,10 @@ jobs:
           cd src
           ./shellcheck.sh
 
-      - name: Check dockerfile (hadolint)
+      - name: Check Dockerfile (hadolint)
         run: |
           cd src
           ./dockerfile_check.sh
-
-  build_docker_image:
-    name: Build docker image
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Repo checkout
-        uses: actions/checkout@v2
 
       - name: Build image
         run: |
@@ -47,7 +65,7 @@ jobs:
           --build-arg BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
           --build-arg S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION}" \
           --build-arg UBUNTU_VERSION="${UBUNTU_VERSION}" \
-          -t "oupfiz5/ubuntu-s6:${{ github.sha }}" \
+          -t "${REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}" \
           -f ./Dockerfile \
           .
 
@@ -55,13 +73,10 @@ jobs:
         run: |
           cd ${GITHUB_WORKSPACE}/src
           docker image ls
-          ./docker_image_check.sh "oupfiz5/ubuntu-s6:${{ github.sha }}"
+          ./docker_image_check.sh "${REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}"
 
       - name: Check container
         run: |
           cd ${GITHUB_WORKSPACE}/tests
-          docker run -d --rm --name=ubuntu-s6 "oupfiz5/ubuntu-s6:${{ github.sha }}"
-          wait 5
-          docker container inspect ubuntu-s6
-          tests/.bats-battery/bats-core/bin/bats tests/
-          docker container stop ubuntu-s6
+          docker run -d --rm --name="${CONTAINER_NAME}" "${REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}"
+          .bats-battery/bats-core/bin/bats .

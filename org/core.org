@@ -119,8 +119,11 @@ UBUNTU_VERSION='20.04'
     push:
       branches:
         - master
-      tags:
-        - 'v*'
+        - main
+    pull_request:
+      branches:
+        - master
+        - main
 
   jobs:
     build:
@@ -151,19 +154,44 @@ UBUNTU_VERSION='20.04'
 
   # * Controls
   # Controls when the action will run.
-  on: [push, pull_request, workflow_dispatch]
-  #    paths:
-  #      - .github/workflows/*
-  #      - .github/*
-  #      - Dockerfile
-  #      - rootfs/*
-  #      - hook/*
+  on:
+    push:
+      paths:
+        - '.github/workflows/*'
+        - '.github/*'
+        - 'src/Dockerfile'
+        - 'src/rootfs/*'
+        - 'src/hook/*'
+        - 'src/*.sh'
+        - 'tests/**'
+      branches-ignore:
+        - 'master'
+        - 'main'
+    pull_request:
+      paths:
+        - '.github/workflows/*'
+        - '.github/*'
+        - 'src/Dockerfile'
+        - 'src/rootfs/*'
+        - 'src/hook/*'
+        - 'src/*.sh'
+        - 'tests/**'
+      branches-ignore:
+        - 'master'
+        - 'main'
+    workflow_dispatch:
 
+  # * Environments
+  env:
+    CONTAINER_NAME: "ubuntu-s6"
+    IMAGE_NAME: "ubuntu-s6"
+    IMAGE_TAG: "${{ github.sha }}"
+    REPOSITORY: "oupfiz5"
 
   # * Jobs
   jobs:
     checks:
-      name: Checks shell code and Dockerfile
+      name: Checks
       runs-on: ubuntu-20.04
       steps:
         - name: Repo checkout
@@ -176,17 +204,10 @@ UBUNTU_VERSION='20.04'
             cd src
             ./shellcheck.sh
 
-        - name: Check dockerfile (hadolint)
+        - name: Check Dockerfile (hadolint)
           run: |
             cd src
             ./dockerfile_check.sh
-
-    build_docker_image:
-      name: Build docker image
-      runs-on: ubuntu-20.04
-      steps:
-        - name: Repo checkout
-          uses: actions/checkout@v2
 
         - name: Build image
           run: |
@@ -196,7 +217,7 @@ UBUNTU_VERSION='20.04'
             --build-arg BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
             --build-arg S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION}" \
             --build-arg UBUNTU_VERSION="${UBUNTU_VERSION}" \
-            -t "oupfiz5/ubuntu-s6:${{ github.sha }}" \
+            -t "${REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}" \
             -f ./Dockerfile \
             .
 
@@ -204,16 +225,13 @@ UBUNTU_VERSION='20.04'
           run: |
             cd ${GITHUB_WORKSPACE}/src
             docker image ls
-            ./docker_image_check.sh "oupfiz5/ubuntu-s6:${{ github.sha }}"
+            ./docker_image_check.sh "${REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}"
 
         - name: Check container
           run: |
             cd ${GITHUB_WORKSPACE}/tests
-            docker run -d --rm --name=ubuntu-s6 "oupfiz5/ubuntu-s6:${{ github.sha }}"
-            wait 5
-            docker container inspect ubuntu-s6
-            tests/.bats-battery/bats-core/bin/bats tests/
-            docker container stop ubuntu-s6
+            docker run -d --rm --name="${CONTAINER_NAME}" "${REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}"
+            .bats-battery/bats-core/bin/bats .
 #+end_src
 
 ** ../.github/.trigger_on_push :code:
@@ -329,32 +347,6 @@ UBUNTU_VERSION='20.04'
   exit $?
 #+end_src
 
-#+RESULTS:
-#+begin_example
-[35mINFO[0m	- [36mCIS-DI-0005[0m: Enable Content trust for Docker
-        ,* export DOCKER_CONTENT_TRUST=1 before docker pull/build
-[35mINFO[0m	- [36mCIS-DI-0006[0m: Add HEALTHCHECK instruction to the container image
-        ,* not found HEALTHCHECK statement
-[35mINFO[0m	- [36mCIS-DI-0008[0m: Confirm safety of setuid/setgid files
-        ,* setgid file: grwxr-xr-x usr/sbin/pam_extrausers_chkpwd
-        ,* setgid file: grwxr-xr-x usr/bin/expiry
-        ,* setuid file: urwxr-xr-x usr/bin/passwd
-        ,* setuid file: urwxr-xr-x usr/bin/gpasswd
-        ,* setuid file: urwxr-xr-x usr/bin/chfn
-        ,* setuid file: urwxr-xr-x usr/bin/umount
-        ,* setgid file: grwxr-xr-x usr/sbin/unix_chkpwd
-        ,* setuid file: urwxr-xr-x usr/bin/s6-overlay-preinit
-        ,* setgid file: grwxr-xr-x usr/bin/chage
-        ,* setuid file: urwxr-xr-x usr/bin/mount
-        ,* setuid file: urwxr-xr-x usr/bin/chsh
-        ,* setgid file: grwxr-xr-x usr/bin/wall
-        ,* setuid file: urwxr-xr-x usr/bin/su
-        ,* setuid file: urwxr-xr-x usr/bin/newgrp
-[34mIGNORE[0m	- [36mCIS-DI-0001[0m: Create a user for the container
-[34mIGNORE[0m	- [36mCIS-DI-0009[0m: Use COPY instead of ADD in Dockerfile
-[34mIGNORE[0m	- [36mDKL-DI-0006[0m: Avoid latest tag
-#+end_example
-
 ** .dockleignore :code:
 #+begin_src sh :shebang ""
 # Use COPY instead of ADD in Dockerfile because need to add s6-overlay from urlencode
@@ -465,47 +457,57 @@ CIS-DI-0001
 * Tests :test:
 ** 01.container.bats
 #+begin_src bats
-  @test "Verify state status container ubuntu-s6 (running)" {
-        run docker inspect --format 'result={{ .State.Status }}' "ubuntu-s6"
+
+  setup() {
+      export CONTAINER_NAME="${CONTAINER_NAME:-ubuntu-s6}"
+  }
+
+  @test "Verify state status container - running" {
+        sleep 5
+        run docker inspect --format 'result={{ .State.Status }}' "${CONTAINER_NAME}"
         assert_success
         assert_output 'result=running'
   }
 
-  @test "Verify state running container ubuntu-s6 (true)" {
-        run docker inspect --format 'result={{ .State.Running }}' "ubuntu-s6"
+  @test "Verify state running container - true" {
+        run docker inspect --format 'result={{ .State.Running }}' "${CONTAINER_NAME}"
         assert_success
         assert_output 'result=true'
   }
 
-  @test "Verify state restarting container ubuntu-s6 (false)" {
-        run docker inspect --format 'result={{ .State.Restarting }}' "ubuntu-s6"
+  @test "Verify state restarting container - false" {
+        run docker inspect --format 'result={{ .State.Restarting }}' "${CONTAINER_NAME}"
         assert_success
         assert_output 'result=false'
   }
 
-  @test "Verify state error container ubuntu-s6 ("")" {
-        run docker inspect --format 'result={{ .State.Error }}' "ubuntu-s6"
+  @test "Verify state error container - <empty>" {
+        run docker inspect --format 'result={{ .State.Error }}' "${CONTAINER_NAME}"
         assert_success
         assert_output 'result='
   }
 
-  @test "Verify restart count container ubuntu-s6 (0)" {
-        run docker inspect --format 'result={{ .RestartCount }}' "ubuntu-s6"
+  @test "Verify restart count container - 0" {
+        run docker inspect --format 'result={{ .RestartCount }}' "${CONTAINER_NAME}"
         assert_success
         assert_output 'result=0'
   }
 
-  @test "Verify AppArmor Profile, if applicable: ubuntu-s6" {
+  @test "Verify AppArmor Profile - if applicable" {
         skip
-        run docker inspect --format 'AppArmorProfile={{ .AppArmorProfile }}' "ubuntu-s6"
+        run docker inspect --format 'AppArmorProfile={{ .AppArmorProfile }}' "${CONTAINER_NAME}"
         assert_success
         refute_output "AppArmorProfile=[]"
         refute_output "AppArmorProfile="
         refute_output "AppArmorProfile=<no value>"
   }
-#+end_src
 
-#+RESULTS:
+  @test "Verify container stop" {
+        run docker container stop "${CONTAINER_NAME}"
+        assert_success
+  }
+
+#+end_src
 
 * Local hooks :noexport:
 
@@ -527,12 +529,16 @@ CIS-DI-0001
   #+end_src
 
   #+RESULTS:
+  : Fri 02 Jul 2021 11:48:42 PM MSK
+  : Branch is trunk
+  : fossil create new branch check-container
+  : New_Version: 121ee27242ff6801350ebe99b5aa93ef863805b44f1c51fb46e50863701589d7
 
 ** Fossil. Merge to trunk.  + Git export :noexport:
 Fill commit mesage above:
 #+name: merge-commit-message
 #+begin_src org :tangle no
-  Merged branch add-shellchecks
+  Merged branch check-container
 #+end_src
 
   #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
@@ -542,7 +548,7 @@ Fill commit mesage above:
     fossil checkout trunk
     fossil merge "${current_branch}"
     echo "fossil commit -m ..."
-    fossil commit -m "<<merge-commit-message>>" --no-warnings --tag v0.0.1
+    fossil commit -m "Merged branch ${current_branch}" --no-warnings --tag v0.0.1
     # echo ""
     echo "fossil git export ..."
     fossil git export
@@ -565,7 +571,7 @@ Fill commit mesage above:
 Fill commit mesage above:
 #+name: commit-message
 #+begin_src org :tangle no
-  ci(tests): added directory tests with bats file for image test
+lp: updated  core.org
 #+end_src
 
   #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
@@ -578,12 +584,3 @@ Fill commit mesage above:
     echo "fossil git export ..."
     fossil git export
   #+end_src
-
-  #+RESULTS:
-  : Fri 02 Jul 2021 08:55:26 PM MSK
-  : Branch is check-container
-  :
-  : fossil commit -m ...
-  :
-  : fossil git export ...
-  : no changes
