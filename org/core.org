@@ -119,8 +119,11 @@ UBUNTU_VERSION='20.04'
     push:
       branches:
         - master
-      tags:
-        - 'v*'
+        - main
+    pull_request:
+      branches:
+        - master
+        - main
 
   jobs:
     build:
@@ -571,7 +574,7 @@ CIS-DI-0001
 Fill commit mesage above:
 #+name: merge-commit-message
 #+begin_src org :tangle no
-  Merged branch add-shellchecks
+  Merged branch check-container
 #+end_src
 
   #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
@@ -604,7 +607,7 @@ Fill commit mesage above:
 Fill commit mesage above:
 #+name: commit-message
 #+begin_src org :tangle no
-ci(test): updated test pipeline
+ci(test): updated on_push pipeline
 #+end_src
 
   #+begin_src sh :tangle no :dir (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")))
@@ -620,15 +623,15 @@ ci(test): updated test pipeline
 
   #+RESULTS:
   #+begin_example
-  Sat 03 Jul 2021 08:11:19 AM MSK
+  Sat 03 Jul 2021 08:22:27 AM MSK
   Branch is check-container
 
   fossil commit -m ...
-  New_Version: a919b1fc5db2331cfc39b9f4646d4e7056beef9dd2d663eb72738fbd6f379e88
+  New_Version: ef0bca038ca37dc828cec2ea75ff263567a9e6d8e47f957b36a7e51be977436d
 
   fossil git export ...
   git fast-import --export-marks=.mirror_state/marks.txt --quiet --done
   1/1      1 check-ins added to the /home/opsa/Projects/ubuntu-s6/.github-mirroring/ubuntu-s6.git
-  git update-ref "refs/heads/check-container" cbb6ec24e8d10a59b5b95fb1591eeb060f1565c1
+  git update-ref "refs/heads/check-container" 8de41b9049d5994eabc6bf5afab75d51f19318a8
   git push --mirror https://oupfiz5@github.com/oupfiz5/ubuntu-s6.git
   #+end_example
