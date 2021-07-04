@@ -27,25 +27,6 @@ If you are reading this on GitHub, then you are looking at a Git mirror of the s
 - [[#troubleshooting][Troubleshooting]]
   - [[#log-output][Log output]]
   - [[#shell-access][Shell access]]
-- [[#code][Code]]
-  - [[#version][VERSION]]
-  - [[#githubworkflowson-pushyaml][../.github/workflows/on-push.yaml]]
-  - [[#githubworkflowstestyaml][../.github/workflows/test.yaml]]
-  - [[#githubtrigger_on_push][../.github/.trigger_on_push]]
-  - [[#gitignore][../.gitignore]]
-  - [[#dockerfile][Dockerfile]]
-  - [[#hookbuildsh][hook/build.sh]]
-  - [[#hookpushsh][hook/push.sh]]
-  - [[#rootfsetccont-finishdgitignore][rootfs/etc/cont-finish.d/.gitignore]]
-  - [[#rootfsetccont-initd00_settimezonesh][rootfs/etc/cont-init.d/00_settimezone.sh]]
-  - [[#rootfsetcfix-attrsdgitignore][rootfs/etc/fix-attrs.d/.gitignore]]
-  - [[#rootfsetcservicesdgitignore][rootfs/etc/services.d/.gitignore]]
-- [[#tests][Tests]]
-  - [[#01shellchecksbats][01.shellchecks.bats]]
-  - [[#02dockerfile_checkbats][02.dockerfile_check.bats]]
-  - [[#03docker_image_checkbats][03.docker_image_check.bats]]
-  - [[#04container_checkbats][04.container_check.bats]]
-  - [[#dockleignore][.dockleignore]]
 
 * Installation
 ** Download from dockerhub
@@ -106,7 +87,7 @@ docker run -it --rm \
 #+begin_example
 docker exec -it ubuntu-s6 /bin/bash
 #+end_example
-* Code :code:
+* Code :code:noexport:
 ** VERSION :code:
 #+begin_src sh :shebang ""
 S6_OVERLAY_VERSION='2.2.0.3'
@@ -188,7 +169,6 @@ UBUNTU_VERSION='20.04'
     IMAGE_NAME: "ubuntu-s6"
     IMAGE_TAG: "${{ github.sha }}"
     REPOSITORY: "oupfiz5"
-    IMAGE: "${REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}"
 
   # * Jobs
   jobs:
@@ -215,6 +195,7 @@ UBUNTU_VERSION='20.04'
           run: |
             cd ${GITHUB_WORKSPACE}/src
             set -a; source VERSION ; set +a;
+            export IMAGE="${REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}"
             docker build \
             --build-arg BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
             --build-arg S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION}" \
@@ -226,11 +207,13 @@ UBUNTU_VERSION='20.04'
         - name: Check docker image (dockle)
           run: |
             cd ${GITHUB_WORKSPACE}/tests
+            export IMAGE="${REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}"
             .bats-battery/bats-core/bin/bats 03.docker_image_check.bats
 
         - name: Check docker container
           run: |
             cd ${GITHUB_WORKSPACE}/tests
+            export IMAGE="${REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}"
             .bats-battery/bats-core/bin/bats 04.container_check.bats
 #+end_src
 
@@ -367,7 +350,7 @@ UBUNTU_VERSION='20.04'
 :END:
 #+begin_src sh :shebang ""
 #+end_src
-* Tests :test:
+* Tests :test:noexport:
 :PROPERTIES:
 :header-args:bats+:   :tangle (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")) "/tests/" (nth 4 (org-heading-components)) )
 :header-args:sh+:  :tangle (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")) "/tests/" (nth 4 (org-heading-components)) )
