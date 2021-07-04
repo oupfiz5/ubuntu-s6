@@ -2,7 +2,13 @@
 load './helpers.bash'
 
 setup() {
+    export IMAGE="${IMAGE:-oupfiz5/ubuntu-s6:latest}"
     export CONTAINER_NAME="${CONTAINER_NAME:-ubuntu-s6}"
+}
+
+@test "Verify container run" {
+      run docker run -d --rm --name="${CONTAINER_NAME}" "${IMAGE}"
+      assert_success
 }
 
 @test "Verify state status container - running" {
@@ -36,14 +42,14 @@ setup() {
       assert_output 'result=0'
 }
 
-@test "Verify AppArmor Profile - if applicable" {
-      skip
-      run docker inspect --format 'AppArmorProfile={{ .AppArmorProfile }}' "${CONTAINER_NAME}"
-      assert_success
-      refute_output "AppArmorProfile=[]"
-      refute_output "AppArmorProfile="
-      refute_output "AppArmorProfile=<no value>"
-}
+# @test "Verify AppArmor Profile - if applicable" {
+#       skip
+#       run docker inspect --format 'AppArmorProfile={{ .AppArmorProfile }}' "${CONTAINER_NAME}"
+#       assert_success
+#       refute_output "AppArmorProfile=[]"
+#       refute_output "AppArmorProfile="
+#       refute_output "AppArmorProfile=<no value>"
+# }
 
 @test "Verify container stop" {
       run docker container stop "${CONTAINER_NAME}"
