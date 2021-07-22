@@ -180,10 +180,26 @@ UBUNTU_VERSION='20.04'
       branches:
         - master
         - main
+      paths:
+        - '.github/workflows/*'
+        - '.github/*'
+        - 'src/Dockerfile'
+        - 'src/rootfs/*'
+        - 'src/hook/*'
+        - 'src/*.sh'
+        - 'tests/**'
     pull_request:
       branches:
         - master
         - main
+      paths:
+        - '.github/workflows/*'
+        - '.github/*'
+        - 'src/Dockerfile'
+        - 'src/rootfs/*'
+        - 'src/hook/*'
+        - 'src/*.sh'
+        - 'tests/**'
 
   jobs:
     build:
