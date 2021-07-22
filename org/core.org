@@ -180,10 +180,26 @@ UBUNTU_VERSION='20.04'
       branches:
         - master
         - main
+      paths:
+        - '.github/workflows/*'
+        - '.github/*'
+        - 'src/Dockerfile'
+        - 'src/rootfs/*'
+        - 'src/hook/*'
+        - 'src/*.sh'
+        - 'tests/**'
     pull_request:
       branches:
         - master
         - main
+      paths:
+        - '.github/workflows/*'
+        - '.github/*'
+        - 'src/Dockerfile'
+        - 'src/rootfs/*'
+        - 'src/hook/*'
+        - 'src/*.sh'
+        - 'tests/**'
 
   jobs:
     build:
@@ -303,7 +319,7 @@ UBUNTU_VERSION='20.04'
 :CUSTOM_ID: h:65385037-0aaf-4eec-9061-a16d94ae8d74
 :END:
 #+begin_src sh :shebang ""
-  Trigger:3
+  Trigger:4
 #+end_src
 ** ../.gitignore :code:
 :PROPERTIES:
