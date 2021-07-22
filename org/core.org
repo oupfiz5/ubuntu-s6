@@ -1,12 +1,19 @@
 #+title: Ubuntu base docker image using s6-overlay
 * Auxiliary Information                                            :noexport:
+:PROPERTIES:
+:CUSTOM_ID: h:24557e2a-7c1a-4a01-adaa-5cb0ae2abdf1
+:END:
 The setupfile contain global common property configuration:
 #+SETUPFILE: .configuration/global_vars_org.setup
 #+SETUPFILE: .configuration/global_property_org.setup
 #+SETUPFILE: .configuration/global_vars_html.setup
 #+EXPORT_FILE_NAME: ../Readme
+#+OPTIONS: auto-id:t
 
 * About
+:PROPERTIES:
+:CUSTOM_ID: h:53b0a7f5-76d9-4c40-a735-b6873507a6bc
+:END:
 
 This is [[https://hub.docker.com/_/ubuntu][ubuntu base docker image]] (version 20.04) using [[https://github.com/just-containers/s6-overlay][s6-overlay]].
 
@@ -15,6 +22,9 @@ Ubuntu-s6 is self-hosting at https://chiselapp.com/user/oupfiz5/repository/ubunt
 If you are reading this on GitHub, then you are looking at a Git mirror of the self-hosting Ubuntu-s6 repository.  The purpose of that mirror is to test and exercise Fossil's ability to export a Git mirror and using Github CI/CD  (Github Actions). Nobody much uses the GitHub mirror, except to verify that the mirror logic works. If you want to know more about Ubuntu-s6, visit the official self-hosting site linked above.
 
 * Table of Contents :TOC_3:noexport:
+:PROPERTIES:
+:CUSTOM_ID: h:26f6112f-72bb-4477-9527-6f005a3dd037
+:END:
 - [[#about][About]]
 - [[#prerequisite][Prerequisite]]
   - [[#tools][Tools]]
@@ -32,12 +42,21 @@ If you are reading this on GitHub, then you are looking at a Git mirror of the s
   - [[#shell-access][Shell access]]
 
 * Prerequisite
+:PROPERTIES:
+:CUSTOM_ID: h:9283ccc3-f6ff-4ca7-af60-6ba2827d1255
+:END:
 ** Tools
+:PROPERTIES:
+:CUSTOM_ID: h:a3405a5c-7b6b-47d6-88e8-670a2a3e0ef9
+:END:
 1. *nix operation system
 2. Install Docker
 3. Install git (optional)
 4. Install fossil (optional)
 ** Third party tools
+:PROPERTIES:
+:CUSTOM_ID: h:ff933ce2-15ea-4e97-b285-9cb705d97adc
+:END:
 They are using for testing and scanning:
 1. BATS
 2. Shellcheck
@@ -46,13 +65,22 @@ They are using for testing and scanning:
 5. Snyk
 6. Trivy
 * Installation
+:PROPERTIES:
+:CUSTOM_ID: h:19c8c605-bd2e-4a06-b30f-45160b56fe33
+:END:
 ** Download from dockerhub
+:PROPERTIES:
+:CUSTOM_ID: h:749f3a93-53a9-461b-b6d4-f20b72a1f70d
+:END:
 #+begin_example
 docker pull oupfiz5/ubuntu-s6:latest
 docker pull oupfiz5/ubuntu-s6:20.04
 #+end_example
 
 ** Build from chiselapp (fossil)
+:PROPERTIES:
+:CUSTOM_ID: h:cea39dc9-87ef-4950-966f-c58c4428021f
+:END:
 #+begin_example
 fossil clone https://chiselapp.com/user/oupfiz5/repository/ubuntu-s6 ubuntu-s6.fossil
 mkdir ubuntu-s6
@@ -62,6 +90,9 @@ docker build -t oupfiz5/ubuntu-s6 .
 #+end_example
 
 ** Build from github
+:PROPERTIES:
+:CUSTOM_ID: h:3325841a-8fe0-443d-9c32-8a2c723c1b15
+:END:
 #+begin_example
 git clone https://github.com/oupfiz5/ubuntu-s6.git
 cd ubuntu-s6
@@ -69,7 +100,13 @@ docker build -t oupfiz5/ubuntu-s6 .
 #+end_example
 
 * Configuration options
+:PROPERTIES:
+:CUSTOM_ID: h:7c3f1b20-a1be-48b4-8d46-276029aa244f
+:END:
 ** General options
+:PROPERTIES:
+:CUSTOM_ID: h:daa5b735-9632-4d65-bc55-10fc29fa940e
+:END:
 |--------+---------+-------------------------------------|
 | Option | Default | Description                         |
 |--------+---------+-------------------------------------|
@@ -77,6 +114,9 @@ docker build -t oupfiz5/ubuntu-s6 .
 |--------+---------+-------------------------------------|
 
 ** Timezone
+:PROPERTIES:
+:CUSTOM_ID: h:aaf92048-f4f1-42d5-b60b-525dde2e18c8
+:END:
 Set the timezone for the container, defaults to UTC. To set the
 timezone set the desired timezone with the variable TZ.
 
@@ -88,9 +128,18 @@ docker run -itd --restart always \
 #+end_example
 
 * Continues Integration
+:PROPERTIES:
+:CUSTOM_ID: h:78c9b494-2e3e-4f81-a297-a0bde9141a2a
+:END:
 For  build and push docker images we use  [[https://github.com/oupfiz5/ubuntu-s6/blob/master/.github/workflows/on-push.yaml][Github Actions workflow]]. Flow process is [[https://guides.github.com/introduction/flow/][GitHub flow]].
 * Troubleshooting
+:PROPERTIES:
+:CUSTOM_ID: h:6237bea9-415b-4fa0-bd47-df6a8743c1f7
+:END:
 ** Log output
+:PROPERTIES:
+:CUSTOM_ID: h:d899a010-2e0b-474b-93ac-ae145a09decb
+:END:
 For debugging and maintenance purposes you may want access the output log. If you are using Docker version 1.3.0 or higher you can access a running containers shell by starting bash using docker interactive:
 
 #+begin_example
@@ -100,17 +149,29 @@ docker run -it --rm \
 #+end_example
 
 ** Shell access
+:PROPERTIES:
+:CUSTOM_ID: h:0065f92d-56b9-454f-8224-79b322ab7132
+:END:
    For debugging and maintenance purposes you may want access the containers shell. If you are using Docker version 1.3.0 or higher you can access a running containers shell by starting bash using docker exec:
 #+begin_example
 docker exec -it ubuntu-s6 /bin/bash
 #+end_example
 * Code :code:noexport:
+:PROPERTIES:
+:CUSTOM_ID: h:7d51c7d1-454a-4754-8597-f949683778b0
+:END:
 ** VERSION :code:
+:PROPERTIES:
+:CUSTOM_ID: h:a95b6a6d-2bd4-4e0d-bb24-ff30501dc609
+:END:
 #+begin_src sh :shebang ""
 S6_OVERLAY_VERSION='2.2.0.3'
 UBUNTU_VERSION='20.04'
 #+end_src
 ** ../.github/workflows/on-push.yaml :code:
+:PROPERTIES:
+:CUSTOM_ID: h:79700600-2637-47df-b585-82dcf69772da
+:END:
 #+begin_src yaml :shebang ""
   name: Build and push docker images
 
@@ -148,6 +209,9 @@ UBUNTU_VERSION='20.04'
 #+end_src
 
 ** ../.github/workflows/test.yaml :code:
+:PROPERTIES:
+:CUSTOM_ID: h:c3c8e871-9fa5-4f2c-934a-edd02e2f6108
+:END:
 #+begin_src yaml :shebang ""
   name: Tests
 
@@ -235,15 +299,24 @@ UBUNTU_VERSION='20.04'
 #+end_src
 
 ** ../.github/.trigger_on_push :code:
+:PROPERTIES:
+:CUSTOM_ID: h:65385037-0aaf-4eec-9061-a16d94ae8d74
+:END:
 #+begin_src sh :shebang ""
   Trigger:3
 #+end_src
 ** ../.gitignore :code:
+:PROPERTIES:
+:CUSTOM_ID: h:149873c4-3958-4403-bacb-2984c3d35f3d
+:END:
 #+begin_src sh :shebang ""
   .fslckout
   .projectile
 #+end_src
 ** Dockerfile :code:
+:PROPERTIES:
+:CUSTOM_ID: h:19eb7209-826b-4a7c-8b4b-5d9550505451
+:END:
 #+begin_src sh :shebang ""
   # * Base image
   ARG UBUNTU_VERSION=20.04
@@ -295,6 +368,9 @@ UBUNTU_VERSION='20.04'
   ENTRYPOINT ["/init"]
 #+end_src
 ** hook/build.sh :code:
+:PROPERTIES:
+:CUSTOM_ID: h:6f1bb832-bbfd-4447-a14b-f0c9f8545634
+:END:
 #+begin_src sh  :results output pp :noweb strip-export :dir ../src/hook
   # shellcheck disable=SC1091
   set -a; source ../VERSION ; set +a;
@@ -315,6 +391,9 @@ UBUNTU_VERSION='20.04'
 : oupfiz5/ubuntu-s6:20.04
 
 ** hook/push.sh :code:
+:PROPERTIES:
+:CUSTOM_ID: h:cb3a194b-bd12-4e0d-b99b-647b854bf592
+:END:
 #+begin_src sh :results output pp :noweb strip-export :dir ../src/hook
   # shellcheck disable=SC1091
   set -a; source ../VERSION ; set +a;
@@ -329,11 +408,15 @@ UBUNTU_VERSION='20.04'
 ** rootfs/etc/cont-finish.d/.gitignore :code:notangle:
 :PROPERTIES:
 :header-args:sh: :tangle no
+:CUSTOM_ID: h:e352f007-4b2c-4382-a90b-0b30d9b1ddd2
 :END:
 #+begin_src sh :shebang ""
 #+end_src
 
 ** rootfs/etc/cont-init.d/00_settimezone.sh :code:
+:PROPERTIES:
+:CUSTOM_ID: h:cfeb1032-a3d5-4fa4-a7df-e49336f02434
+:END:
 #+begin_src with-contenv :tangle-mode (identity #o755)
   # shellcheck shell=sh
 
@@ -358,12 +441,14 @@ UBUNTU_VERSION='20.04'
 ** rootfs/etc/fix-attrs.d/.gitignore :code:notangle:
 :PROPERTIES:
 :header-args:sh: :tangle no
+:CUSTOM_ID: h:b4129b8b-08fb-4b1b-aae0-4a32709d8915
 :END:
 #+begin_src sh :shebang ""
 #+end_src
 ** rootfs/etc/services.d/.gitignore :code:notangle:
 :PROPERTIES:
 :header-args:sh: :tangle no
+:CUSTOM_ID: h:7af6e559-a193-4248-91d7-c335dd4efd95
 :END:
 #+begin_src sh :shebang ""
 #+end_src
@@ -371,9 +456,13 @@ UBUNTU_VERSION='20.04'
 :PROPERTIES:
 :header-args:bats+:   :tangle (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")) "/tests/" (nth 4 (org-heading-components)) )
 :header-args:sh+:  :tangle (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")) "/tests/" (nth 4 (org-heading-components)) )
+:CUSTOM_ID: h:cf5656cf-7cd9-42fa-84c7-c7fce0a2763b
 :END:
 
 ** 01.shellchecks.bats :test:
+:PROPERTIES:
+:CUSTOM_ID: h:d2101afe-38ec-4b9e-a6f6-982801b15cc3
+:END:
 #+begin_src bats :results output pp :noweb strip-export
 
   setup() {
@@ -407,6 +496,9 @@ UBUNTU_VERSION='20.04'
 : ok 2 Check VERSION file
 
 ** 02.dockerfile_check.bats :test:
+:PROPERTIES:
+:CUSTOM_ID: h:6fb0f638-ce20-4f89-9cda-ccf615777234
+:END:
 #+begin_src bats :results output pp :noweb strip-export
 
   @test "Check Dockerfile" {
@@ -420,6 +512,9 @@ UBUNTU_VERSION='20.04'
 : 1..1
 : ok 1 Check Dockerfile
 ** 03.docker_image_check.bats :test:
+:PROPERTIES:
+:CUSTOM_ID: h:f61d7934-5da7-4853-858f-2505c5610668
+:END:
 
 #+begin_src bats :results output pp :noweb strip-export
 
@@ -449,6 +544,9 @@ UBUNTU_VERSION='20.04'
 : ok 1 Check docker image
 
 ** 04.container_check.bats :test:
+:PROPERTIES:
+:CUSTOM_ID: h:f36747cd-2f4a-4ffe-874a-7383ef466e40
+:END:
 #+begin_src bats :results output pp :noweb strip-export
 
   setup() {
@@ -520,6 +618,9 @@ UBUNTU_VERSION='20.04'
 : ok 8 Verify container stop
 
 ** shellcheck.sh :test:noexport:notangle:
+:PROPERTIES:
+:CUSTOM_ID: h:a9a7b30a-0151-4ae2-862a-cd80efd77709
+:END:
 #+begin_src sh :results output pp :noweb strip-export :tangle no
   set -e
 
@@ -547,6 +648,9 @@ UBUNTU_VERSION='20.04'
 #+end_src
 
 ** docker_image_check.sh :test:noexport:notangle:
+:PROPERTIES:
+:CUSTOM_ID: h:ce2b6525-4ea4-47b5-b5d6-c42c65b6bcb9
+:END:
 #+begin_src sh :results output pp :noweb strip-export :tangle no
   set -e
   IMAGE_NAME="${1:-oupfiz5/ubuntu-s6:latest}"
@@ -568,6 +672,9 @@ UBUNTU_VERSION='20.04'
 #+end_src
 
 ** .dockleignore :test:
+:PROPERTIES:
+:CUSTOM_ID: h:6b875cbe-74f6-4f2c-be15-b606f32b2734
+:END:
 #+begin_src sh :shebang ""
 # Use COPY instead of ADD in Dockerfile because need to add s6-overlay from urlencode
 CIS-DI-0009
@@ -577,6 +684,9 @@ DKL-DI-0006
 CIS-DI-0001
 #+end_src
 ** dockerfile_check.sh :test:noexport:notangle:
+:PROPERTIES:
+:CUSTOM_ID: h:4bf837a1-3f9f-4217-85d3-49987abcd583
+:END:
 #+begin_src sh :results output pp :noweb strip-export :tangle no
     set -e
 
@@ -602,7 +712,13 @@ CIS-DI-0001
 : Test Dockerfile
 : Success
 * TODO Next steps :noexport:notangle:
+:PROPERTIES:
+:CUSTOM_ID: h:3ffce095-9f6b-47ae-92f9-17b236b8ab88
+:END:
 ** Security scan
+:PROPERTIES:
+:CUSTOM_ID: h:04db2cb5-8830-4bab-9d5b-8362fb27c3ff
+:END:
 - add tools:
   - Snyk
   - Trivy
