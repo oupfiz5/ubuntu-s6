@@ -1,0 +1,33 @@
+name: Build and push docker images
+
+on:
+  push:
+    branches:
+      - master
+      - main
+  pull_request:
+    branches:
+      - master
+      - main
+
+jobs:
+  build:
+    name: Build and push image to dockerhub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repo checkout
+        uses: actions/checkout@v2
+
+      - name: Login to DockerHub Registry
+        run: |
+          echo  ${{ secrets.DOCKERHUB_TOKEN }} | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      - name: Build images
+        run: |
+          cd ${GITHUB_WORKSPACE}/src/hook
+          ./build.sh
+
+      - name: Push images
+        run: |
+          cd ${GITHUB_WORKSPACE}/src/hook
+          ./push.sh
