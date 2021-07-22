@@ -168,35 +168,36 @@ docker exec -it ubuntu-s6 /bin/bash
 S6_OVERLAY_VERSION='2.2.0.3'
 UBUNTU_VERSION='20.04'
 #+end_src
-** .fossil-settings/crlf-glob
+** ../.fossil-settings/crlf-glob
 :PROPERTIES:
-:CUSTOM_ID: -fossil-settings-crlf-glob
+:CUSTOM_ID: ----fossil-settings-crlf-glob
 :END:
 #+begin_src sh :shebang ""
   *
 #+end_src
 
-** .fossil-settings/crlf-glob.no-warn
+** ../.fossil-settings/crlf-glob.no-warn
 :PROPERTIES:
-:CUSTOM_ID: -fossil-settings-crlf-glob-no-warn
+:CUSTOM_ID: ----fossil-settings-crlf-glob-no-warn
 :END:
 #+begin_src sh :shebang ""
   *
 #+end_src
-** .fossil-settings/ignore-glob
+** ../.fossil-settings/ignore-glob
 :PROPERTIES:
-:CUSTOM_ID: -fossil-settings-ignore-glob
+:CUSTOM_ID: ----fossil-settings-ignore-glob
 :END:
 #+begin_src sh :shebang ""
-  org/.configuration/*
   .git/
+  .github-mirroring/*
   docs/
+  org/.configuration/*
   tests/.bats-battery/*/.git
   tests/.bats-battery/*/.github
 #+end_src
-** .fossil-settings/crlf-glob
+** ../.fossil-settings/crlf-glob
 :PROPERTIES:
-:CUSTOM_ID: -fossil-settings-crlf-glob
+:CUSTOM_ID: ----fossil-settings-crlf-glob
 :END:
 #+begin_src sh :shebang ""
   *
