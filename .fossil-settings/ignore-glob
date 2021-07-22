@@ -1,0 +1,5 @@
+org/.configuration/*
+.git/
+docs/
+tests/.bats-battery/*/.git
+tests/.bats-battery/*/.github

@@ -168,6 +168,39 @@ docker exec -it ubuntu-s6 /bin/bash
 S6_OVERLAY_VERSION='2.2.0.3'
 UBUNTU_VERSION='20.04'
 #+end_src
+** .fossil-settings/crlf-glob
+:PROPERTIES:
+:CUSTOM_ID: h:b34d8a49-e6d1-44a6-b2fa-86fa67d766da
+:END:
+#+begin_src sh :shebang ""
+  *
+#+end_src
+
+** .fossil-settings/crlf-glob.no-warn
+:PROPERTIES:
+:CUSTOM_ID: h:aef1e757-757a-4d77-95fe-3656326e543a
+:END:
+#+begin_src sh :shebang ""
+  *
+#+end_src
+** .fossil-settings/ignore-glob
+:PROPERTIES:
+:CUSTOM_ID: h:ec21cd50-b8d8-4418-97a2-695b45430910
+:END:
+#+begin_src sh :shebang ""
+  org/.configuration/*
+  .git/
+  docs/
+  tests/.bats-battery/*/.git
+  tests/.bats-battery/*/.github
+#+end_src
+** .fossil-settings/crlf-glob
+:PROPERTIES:
+:CUSTOM_ID: h:5fd6f9fd-1703-467b-93b6-03001ac5b6d1
+:END:
+#+begin_src sh :shebang ""
+  *
+#+end_src
 ** ../.github/workflows/on-push.yaml :code:
 :PROPERTIES:
 :CUSTOM_ID: h:79700600-2637-47df-b585-82dcf69772da
@@ -328,6 +361,7 @@ UBUNTU_VERSION='20.04'
 #+begin_src sh :shebang ""
   .fslckout
   .projectile
+  .fossil-settings/*
 #+end_src
 ** Dockerfile :code:
 :PROPERTIES:
