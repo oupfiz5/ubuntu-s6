@@ -12,7 +12,7 @@ The setupfile contain global common property configuration:
 
 * About
 :PROPERTIES:
-:CUSTOM_ID: h:53b0a7f5-76d9-4c40-a735-b6873507a6bc
+:CUSTOM_ID: h:3d58a96a-43d2-4e02-8d86-326f7e64d54b
 :END:
 
 This is [[https://hub.docker.com/_/ubuntu][ubuntu base docker image]] (version 20.04) using [[https://github.com/just-containers/s6-overlay][s6-overlay]].
@@ -23,7 +23,7 @@ If you are reading this on GitHub, then you are looking at a Git mirror of the s
 
 * Table of Contents :TOC_3:noexport:
 :PROPERTIES:
-:CUSTOM_ID: h:26f6112f-72bb-4477-9527-6f005a3dd037
+:CUSTOM_ID: h:53b0a7f5-76d9-4c40-a735-b6873507a6bc
 :END:
 - [[#about][About]]
 - [[#prerequisite][Prerequisite]]
