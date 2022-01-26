@@ -15,7 +15,7 @@ LABEL \
     org.opencontainers.image.url="https://chiselapp.com/user/oupfiz5/repository/ubuntu-s6/home" \
     org.opencontainers.image.documentation="https://chiselapp.com/user/oupfiz5/repository/ubuntu-s6/wiki" \
     org.opencontainers.image.source="https://chiselapp.com/user/oupfiz5/repository/ubuntu-s6/brlist" \
-    org.opencontainers.image.version="0.0.3d" \
+    org.opencontainers.image.version="0.0.4d" \
     org.opencontainers.image.revision="" \
     org.opencontainers.image.vendor="" \
     org.opencontainers.image.licenses="" \
