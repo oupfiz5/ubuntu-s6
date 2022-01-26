@@ -3,7 +3,7 @@ ARG UBUNTU_VERSION=20.04
 FROM ubuntu:${UBUNTU_VERSION}
 
 # * Arguments
-ARG S6_OVERLAY_VERSION=2.2.0.3 \
+ARG S6_OVERLAY_VERSION=3.0.0.0-1 \
     BUILD_DATE \
     UBUNTU_VERSION
 
@@ -31,18 +31,28 @@ LABEL \
 COPY rootfs/ /
 
 # * Add
-ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-amd64.tar.gz /tmp/s6-overlay.tar.gz
+ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch-${S6_OVERLAY_VERSION}.tar.xz /tmp
+ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64-${S6_OVERLAY_VERSION}.tar.xz /tmp
+ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-symlinks-noarch-${S6_OVERLAY_VERSION}.tar.xz /tmp
+ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-symlinks-arch-${S6_OVERLAY_VERSION}.tar.xz /tmp
+
 
 # * Run
 # hadolint ignore=DL3008,DL3003
 RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata --no-install-recommends && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata xz-utils --no-install-recommends && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     cd /tmp && \
-    tar xzf /tmp/s6-overlay.tar.gz -C / --exclude='./bin' && \
-    tar xzf /tmp/s6-overlay.tar.gz -C /usr ./bin && \
-    rm /tmp/s6-overlay.tar.gz
+    tar -C / -Jxpf /tmp/s6-overlay-noarch-${S6_OVERLAY_VERSION}.tar.xz && \
+    tar -C / -Jxpf /tmp/s6-overlay-x86_64-${S6_OVERLAY_VERSION}.tar.xz && \
+    tar -C / -Jxpf /tmp/s6-overlay-symlinks-noarch-${S6_OVERLAY_VERSION}.tar.xz && \
+    tar -C / -Jxpf /tmp/s6-overlay-symlinks-arch-${S6_OVERLAY_VERSION}.tar.xz && \
+    rm /tmp/s6-overlay-noarch-${S6_OVERLAY_VERSION}.tar.xz && \
+    rm /tmp/s6-overlay-x86_64-${S6_OVERLAY_VERSION}.tar.xz && \
+    rm /tmp/s6-overlay-symlinks-noarch-${S6_OVERLAY_VERSION}.tar.xz && \
+    rm /tmp/s6-overlay-symlinks-arch-${S6_OVERLAY_VERSION}.tar.xz
+
 
 # * Entrypoint
 ENTRYPOINT ["/init"]
