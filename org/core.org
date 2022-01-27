@@ -746,6 +746,14 @@ CIS-DI-0001
 :CUSTOM_ID: security-scan
 :END:
 - add tools:
-  - Snyk
+
+    - Snyk
   - Trivy
 - add report security artifacts
+* Local hooks :noexport:
+:PROPERTIES:
+:CUSTOM_ID: local-hooks
+:END:
+# Local Variables:
+# after-save-hook: (lambda nil (when (org-md-export-to-markdown) (rename-file "core.md" (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")) "src/" "Readme.md" )  t )))
+# End:
