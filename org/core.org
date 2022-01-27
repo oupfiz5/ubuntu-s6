@@ -353,7 +353,7 @@ UBUNTU_VERSION='20.04'
 :CUSTOM_ID: ----github--trigger-on-push
 :END:
 #+begin_src sh :shebang ""
-  Trigger:4
+  Trigger:5
 #+end_src
 ** ../.gitignore :code:
 :PROPERTIES:
@@ -436,7 +436,7 @@ UBUNTU_VERSION='20.04'
   # shellcheck disable=SC1091
   set -a; source ../VERSION ; set +a;
 
-  IMAGE="${IMAGE:-oupfiz5/ubuntu-s6:${UBUNTU_VERSION}-{S6_OVERLAY_VERSION}}"
+  IMAGE="${IMAGE:-oupfiz5/ubuntu-s6:${UBUNTU_VERSION}-${S6_OVERLAY_VERSION}}"
 
   docker build \
          --build-arg BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
@@ -445,6 +445,7 @@ UBUNTU_VERSION='20.04'
          -t "${IMAGE}" \
          -f ../Dockerfile \
           ../.
+
 #+end_src
 
 ** hook/push.sh :code:
@@ -783,5 +784,5 @@ CIS-DI-0001
 :END:
 
 # Local Variables:
-##after-save-hook: (lambda nil (when (org-md-export-to-markdown) (rename-file "core.md" (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")) "src/" "Readme.md" )  t )))
+#after-save-hook: (lambda nil (when (org-md-export-to-markdown) (rename-file "core.md" (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")) "src/" "Readme.md" )  t )))
 # End:
