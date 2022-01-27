@@ -730,9 +730,6 @@ CIS-DI-0001
     exit $?
 #+end_src
 
-#+RESULTS:
-: Test Dockerfile
-: Success
 * TODO Next steps :noexport:notangle:
 :PROPERTIES:
 :CUSTOM_ID: next-steps
@@ -749,6 +746,7 @@ CIS-DI-0001
 :PROPERTIES:
 :CUSTOM_ID: local-hooks
 :END:
+
 # Local Variables:
-# after-save-hook: (lambda nil (when (org-md-export-to-markdown) (rename-file "core.md" (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")) "src/" "Readme.md" )  t )))
+##after-save-hook: (lambda nil (when (org-md-export-to-markdown) (rename-file "core.md" (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")) "src/" "Readme.md" )  t )))
 # End:
