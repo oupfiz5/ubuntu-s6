@@ -401,20 +401,16 @@ UBUNTU_VERSION='20.04'
   # shellcheck disable=SC1091
   set -a; source ../VERSION ; set +a;
 
-  IMAGE="${IMAGE:-oupfiz5/ubuntu-s6:${UBUNTU_VERSION}}"
+  IMAGE="${IMAGE:-oupfiz5/ubuntu-s6:${UBUNTU_VERSION}-{S6_OVERLAY_VERSION}}"
 
   docker build \
          --build-arg BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
          --build-arg S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION}" \
          --build-arg UBUNTU_VERSION="${UBUNTU_VERSION}" \
          -t "${IMAGE}" \
-         -t oupfiz5/ubuntu-s6:latest \
          -f ../Dockerfile \
           ../.
 #+end_src
-
-#+RESULTS:
-: oupfiz5/ubuntu-s6:20.04
 
 ** hook/push.sh :code:
 :PROPERTIES:
@@ -427,8 +423,8 @@ UBUNTU_VERSION='20.04'
   # CIS-DI-0005: Enable Content trust for Docker
   # export DOCKER_CONTENT_TRUST=1
 
-  docker push oupfiz5/ubuntu-s6:"${UBUNTU_VERSION}"
-  docker push oupfiz5/ubuntu-s6:latest
+  docker push oupfiz5/ubuntu-s6:"${UBUNTU_VERSION}-{S6_OVERLAY_VERSION}"
+  #docker push oupfiz5/ubuntu-s6:latest
 #+end_src
 
 ** rootfs/etc/cont-finish.d/.gitignore :code:notangle:
@@ -746,7 +742,6 @@ CIS-DI-0001
 :CUSTOM_ID: security-scan
 :END:
 - add tools:
-
     - Snyk
   - Trivy
 - add report security artifacts
