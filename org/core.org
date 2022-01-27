@@ -165,7 +165,7 @@ docker exec -it ubuntu-s6 /bin/bash
 :CUSTOM_ID: version
 :END:
 #+begin_src sh :shebang ""
-S6_OVERLAY_VERSION='2.2.0.3'
+S6_OVERLAY_VERSION='3.0.0.0-1'
 UBUNTU_VERSION='20.04'
 #+end_src
 ** ../.fossil-settings/crlf-glob
@@ -374,7 +374,7 @@ UBUNTU_VERSION='20.04'
   FROM ubuntu:${UBUNTU_VERSION}
 
   # * Arguments
-  ARG S6_OVERLAY_VERSION=2.2.0.3 \
+  ARG S6_OVERLAY_VERSION=3.0.0.0-1 \
       BUILD_DATE \
       UBUNTU_VERSION
 
@@ -386,7 +386,7 @@ UBUNTU_VERSION='20.04'
       org.opencontainers.image.url="https://chiselapp.com/user/oupfiz5/repository/ubuntu-s6/home" \
       org.opencontainers.image.documentation="https://chiselapp.com/user/oupfiz5/repository/ubuntu-s6/wiki" \
       org.opencontainers.image.source="https://chiselapp.com/user/oupfiz5/repository/ubuntu-s6/brlist" \
-      org.opencontainers.image.version="0.0.3d" \
+      org.opencontainers.image.version="0.0.4d" \
       org.opencontainers.image.revision="" \
       org.opencontainers.image.vendor="" \
       org.opencontainers.image.licenses="" \
@@ -402,18 +402,28 @@ UBUNTU_VERSION='20.04'
   COPY rootfs/ /
 
   # * Add
-  ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-amd64.tar.gz /tmp/s6-overlay.tar.gz
+  ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch-${S6_OVERLAY_VERSION}.tar.xz /tmp
+  ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64-${S6_OVERLAY_VERSION}.tar.xz /tmp
+  ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-symlinks-noarch-${S6_OVERLAY_VERSION}.tar.xz /tmp
+  ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-symlinks-arch-${S6_OVERLAY_VERSION}.tar.xz /tmp
+
 
   # * Run
   # hadolint ignore=DL3008,DL3003
   RUN apt-get update && \
-      DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata --no-install-recommends && \
+      DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata xz-utils --no-install-recommends && \
       apt-get clean && \
       rm -rf /var/lib/apt/lists/* && \
       cd /tmp && \
-      tar xzf /tmp/s6-overlay.tar.gz -C / --exclude='./bin' && \
-      tar xzf /tmp/s6-overlay.tar.gz -C /usr ./bin && \
-      rm /tmp/s6-overlay.tar.gz
+      tar -C / -Jxpf /tmp/s6-overlay-noarch-${S6_OVERLAY_VERSION}.tar.xz && \
+      tar -C / -Jxpf /tmp/s6-overlay-x86_64-${S6_OVERLAY_VERSION}.tar.xz && \
+      tar -C / -Jxpf /tmp/s6-overlay-symlinks-noarch-${S6_OVERLAY_VERSION}.tar.xz && \
+      tar -C / -Jxpf /tmp/s6-overlay-symlinks-arch-${S6_OVERLAY_VERSION}.tar.xz && \
+      rm /tmp/s6-overlay-noarch-${S6_OVERLAY_VERSION}.tar.xz && \
+      rm /tmp/s6-overlay-x86_64-${S6_OVERLAY_VERSION}.tar.xz && \
+      rm /tmp/s6-overlay-symlinks-noarch-${S6_OVERLAY_VERSION}.tar.xz && \
+      rm /tmp/s6-overlay-symlinks-arch-${S6_OVERLAY_VERSION}.tar.xz
+
 
   # * Entrypoint
   ENTRYPOINT ["/init"]
@@ -426,20 +436,16 @@ UBUNTU_VERSION='20.04'
   # shellcheck disable=SC1091
   set -a; source ../VERSION ; set +a;
 
-  IMAGE="${IMAGE:-oupfiz5/ubuntu-s6:${UBUNTU_VERSION}}"
+  IMAGE="${IMAGE:-oupfiz5/ubuntu-s6:${UBUNTU_VERSION}-{S6_OVERLAY_VERSION}}"
 
   docker build \
          --build-arg BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
          --build-arg S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION}" \
          --build-arg UBUNTU_VERSION="${UBUNTU_VERSION}" \
          -t "${IMAGE}" \
-         -t oupfiz5/ubuntu-s6:latest \
          -f ../Dockerfile \
           ../.
 #+end_src
-
-#+RESULTS:
-: oupfiz5/ubuntu-s6:20.04
 
 ** hook/push.sh :code:
 :PROPERTIES:
@@ -452,8 +458,8 @@ UBUNTU_VERSION='20.04'
   # CIS-DI-0005: Enable Content trust for Docker
   # export DOCKER_CONTENT_TRUST=1
 
-  docker push oupfiz5/ubuntu-s6:"${UBUNTU_VERSION}"
-  docker push oupfiz5/ubuntu-s6:latest
+  docker push oupfiz5/ubuntu-s6:"${UBUNTU_VERSION}-{S6_OVERLAY_VERSION}"
+  #docker push oupfiz5/ubuntu-s6:latest
 #+end_src
 
 ** rootfs/etc/cont-finish.d/.gitignore :code:notangle:
@@ -759,9 +765,6 @@ CIS-DI-0001
     exit $?
 #+end_src
 
-#+RESULTS:
-: Test Dockerfile
-: Success
 * TODO Next steps :noexport:notangle:
 :PROPERTIES:
 :CUSTOM_ID: next-steps
@@ -771,6 +774,14 @@ CIS-DI-0001
 :CUSTOM_ID: security-scan
 :END:
 - add tools:
-  - Snyk
+    - Snyk
   - Trivy
 - add report security artifacts
+* Local hooks :noexport:
+:PROPERTIES:
+:CUSTOM_ID: local-hooks
+:END:
+
+# Local Variables:
+##after-save-hook: (lambda nil (when (org-md-export-to-markdown) (rename-file "core.md" (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")) "src/" "Readme.md" )  t )))
+# End:
