@@ -218,9 +218,10 @@ docker exec -it ubuntu-s6 /bin/bash
       paths:
         - '.github/workflows/*'
         - '.github/*'
-        - 'src/Dockerfile'
+        - 'src/Dockerfile*'
         - 'src/rootfs/*'
         - 'src/hook/*'
+        - 'src/VERSIONS'
         - 'src/*.sh'
         - 'tests/**'
     pull_request:
