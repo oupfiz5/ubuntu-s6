@@ -160,13 +160,14 @@ docker exec -it ubuntu-s6 /bin/bash
 :PROPERTIES:
 :CUSTOM_ID: code
 :END:
-** VERSION :code:
+** VERSIONS :code:
 :PROPERTIES:
-:CUSTOM_ID: version
+:CUSTOM_ID: versions
 :END:
 #+begin_src sh :shebang ""
-S6_OVERLAY_VERSION='3.0.0.0-1'
-UBUNTU_VERSION='20.04'
+    S6_OVERLAY_VERSION='3.0.0.2'
+    S6_OVERLAY_IMAGE_TAG='3.0.0.2'
+    UBUNTU_VERSION='20.04'
 #+end_src
 ** ../.fossil-settings/crlf-glob
 :PROPERTIES:
@@ -324,16 +325,9 @@ UBUNTU_VERSION='20.04'
 
         - name: Build image
           run: |
-            cd ${GITHUB_WORKSPACE}/src
-            set -a; source VERSION ; set +a;
             export IMAGE="${REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}"
-            docker build \
-            --build-arg BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
-            --build-arg S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION}" \
-            --build-arg UBUNTU_VERSION="${UBUNTU_VERSION}" \
-            -t "${IMAGE}" \
-            -f ./Dockerfile \
-            .
+            cd ${GITHUB_WORKSPACE}/src/hook
+            ./build.sh
 
         - name: Check docker image (dockle)
           run: |
@@ -374,7 +368,7 @@ UBUNTU_VERSION='20.04'
   FROM ubuntu:${UBUNTU_VERSION}
 
   # * Arguments
-  ARG S6_OVERLAY_VERSION=3.0.0.0-1 \
+  ARG S6_OVERLAY_VERSION=${S6_OVERLAY_VERSION:-3.0.0.2} \
       BUILD_DATE \
       UBUNTU_VERSION
 
@@ -434,9 +428,9 @@ UBUNTU_VERSION='20.04'
 :END:
 #+begin_src sh  :results output pp :noweb strip-export :dir ../src/hook
   # shellcheck disable=SC1091
-  set -a; source ../VERSION ; set +a;
+  set -a; source ../VERSIONS ; set +a;
 
-  IMAGE="${IMAGE:-oupfiz5/ubuntu-s6:${UBUNTU_VERSION}-${S6_OVERLAY_VERSION}}"
+  IMAGE="${IMAGE:-oupfiz5/ubuntu-s6:${UBUNTU_VERSION}-${S6_OVERLAY_IMAGE_TAG}}"
 
   docker build \
          --build-arg BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
@@ -454,13 +448,10 @@ UBUNTU_VERSION='20.04'
 :END:
 #+begin_src sh :results output pp :noweb strip-export :dir ../src/hook
   # shellcheck disable=SC1091
-  set -a; source ../VERSION ; set +a;
+  set -a; source ../VERSIONS ; set +a;
 
-  # CIS-DI-0005: Enable Content trust for Docker
-  # export DOCKER_CONTENT_TRUST=1
-
-  docker push oupfiz5/ubuntu-s6:"${UBUNTU_VERSION}-${S6_OVERLAY_VERSION}"
-  #docker push oupfiz5/ubuntu-s6:latest
+  IMAGE="${IMAGE:-oupfiz5/ubuntu-s6:${UBUNTU_VERSION}-${S6_OVERLAY_IMAGE_TAG}}"
+  docker push "${IMAGE}"
 #+end_src
 
 ** rootfs/etc/cont-finish.d/.gitignore :code:notangle:
