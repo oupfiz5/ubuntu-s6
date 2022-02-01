@@ -50,12 +50,12 @@ If you are reading this on GitHub, then you are looking at a Git mirror of the s
 
 They are using for testing and scanning:
 
-1.  BATS
-2.  Shellcheck
-3.  Hadolynt
-4.  Dockle
-5.  Snyk
-6.  Trivy
+1.  [Bats](https://github.com/bats-core)
+2.  [Shellcheck](https://www.shellcheck.net/)
+3.  [Hadolynt](https://github.com/hadolint/hadolint)
+4.  [Dockle](https://github.com/goodwithtech/dockle)
+5.  Snyk - not necessarily
+6.  Trivy - not necessarily
 
 
 <a id="installation"></a>
@@ -67,8 +67,7 @@ They are using for testing and scanning:
 
 ## Download from dockerhub
 
-    docker pull oupfiz5/ubuntu-s6:latest
-    docker pull oupfiz5/ubuntu-s6:20.04
+    docker pull oupfiz5/ubuntu-s6:20.04-3.1.0.0
 
 
 <a id="build-from-chiselapp--fossil-"></a>
@@ -138,7 +137,7 @@ timezone set the desired timezone with the variable TZ.
     docker run -itd --restart always \
                --name ubuntu-s6  \
                --env 'TZ=Europe/Moscow' \
-               oupfiz5/ubuntu-s6:latest
+               oupfiz5/ubuntu-s6:20.04-3.1.0.0
 
 
 <a id="continues-integration"></a>
@@ -161,7 +160,7 @@ For debugging and maintenance purposes you may want access the output log. If yo
 
     docker run -it --rm \
            --name=ubuntu-s6 \
-           oupfiz5/ubuntu-s6:latest
+           oupfiz5/ubuntu-s6:20.04-3.1.0.0
 
 
 <a id="shell-access"></a>

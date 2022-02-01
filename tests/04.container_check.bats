@@ -2,8 +2,8 @@
 load './helpers.bash'
 
 setup() {
-    export IMAGE="${IMAGE:-oupfiz5/ubuntu-s6:latest}"
-    export CONTAINER_NAME="${CONTAINER_NAME:-ubuntu-s6}"
+    export IMAGE="${IMAGE:?Var IMAGE is null or unset. Exit.}"
+    export CONTAINER_NAME="${CONTAINER_NAME:?Var CONTAINER_NAME is null or unset. Exit.}"
 }
 
 @test "Verify container run" {

@@ -58,12 +58,12 @@ If you are reading this on GitHub, then you are looking at a Git mirror of the s
 :CUSTOM_ID: third-party-tools
 :END:
 They are using for testing and scanning:
-1. BATS
-2. Shellcheck
-3. Hadolynt
-4. Dockle
-5. Snyk
-6. Trivy
+1. [[https://github.com/bats-core][Bats]]
+2. [[https://www.shellcheck.net/][Shellcheck]]
+3. [[https://github.com/hadolint/hadolint][Hadolynt]]
+4. [[https://github.com/goodwithtech/dockle][Dockle]]
+5. Snyk - not necessarily
+6. Trivy - not necessarily
 * Installation
 :PROPERTIES:
 :CUSTOM_ID: installation
@@ -73,8 +73,7 @@ They are using for testing and scanning:
 :CUSTOM_ID: download-from-dockerhub
 :END:
 #+begin_example
-docker pull oupfiz5/ubuntu-s6:latest
-docker pull oupfiz5/ubuntu-s6:20.04
+docker pull oupfiz5/ubuntu-s6:20.04-3.1.0.0
 #+end_example
 
 ** Build from chiselapp (fossil)
@@ -124,7 +123,7 @@ timezone set the desired timezone with the variable TZ.
 docker run -itd --restart always \
            --name ubuntu-s6  \
            --env 'TZ=Europe/Moscow' \
-           oupfiz5/ubuntu-s6:latest
+           oupfiz5/ubuntu-s6:20.04-3.1.0.0
 #+end_example
 
 * Continues Integration
@@ -145,7 +144,7 @@ For debugging and maintenance purposes you may want access the output log. If yo
 #+begin_example
 docker run -it --rm \
        --name=ubuntu-s6 \
-       oupfiz5/ubuntu-s6:latest
+       oupfiz5/ubuntu-s6:20.04-3.1.0.0
 #+end_example
 
 ** Shell access
@@ -274,7 +273,7 @@ docker exec -it ubuntu-s6 /bin/bash
       paths:
         - '.github/workflows/*'
         - '.github/*'
-        - 'src/Dockerfile'
+        - 'src/Dockerfile*'
         - 'src/rootfs/*'
         - 'src/hook/*'
         - 'src/*.sh'
@@ -286,7 +285,7 @@ docker exec -it ubuntu-s6 /bin/bash
       paths:
         - '.github/workflows/*'
         - '.github/*'
-        - 'src/Dockerfile'
+        - 'src/Dockerfile*'
         - 'src/rootfs/*'
         - 'src/hook/*'
         - 'src/*.sh'
@@ -508,7 +507,6 @@ docker exec -it ubuntu-s6 /bin/bash
 :header-args:sh+:  :tangle (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")) "/tests/" (nth 4 (org-heading-components)) )
 :CUSTOM_ID: tests
 :END:
-
 ** 01.shellchecks.bats :test:
 :PROPERTIES:
 :CUSTOM_ID: 01-shellchecks-bats
@@ -533,17 +531,12 @@ docker exec -it ubuntu-s6 /bin/bash
         assert_success
   }
 
-  @test "Check VERSION file" {
-        run export LC_ALL=C.UTF-8; shellcheck --shell=sh --exclude=SC2034 ../src/VERSION
+  @test "Check VERSIONS file" {
+        run export LC_ALL=C.UTF-8; shellcheck --shell=sh --exclude=SC2034 ../src/VERSIONS
         assert_success
   }
 
 #+end_src
-
-#+RESULTS:
-: 1..2
-: ok 1 Check shell files
-: ok 2 Check VERSION file
 
 ** 02.dockerfile_check.bats :test:
 :PROPERTIES:
@@ -558,9 +551,6 @@ docker exec -it ubuntu-s6 /bin/bash
 
 #+end_src
 
-#+RESULTS:
-: 1..1
-: ok 1 Check Dockerfile
 ** 03.docker_image_check.bats :test:
 :PROPERTIES:
 :CUSTOM_ID: 03-docker-image-check-bats
@@ -569,7 +559,7 @@ docker exec -it ubuntu-s6 /bin/bash
 #+begin_src bats :results output pp :noweb strip-export
 
   setup() {
-        IMAGE="${IMAGE:-oupfiz5/ubuntu-s6:latest}"
+        IMAGE="${IMAGE:?Var IMAGE is null or unset. Exit.}"
         VERSION=$(
         curl --silent "https://api.github.com/repos/goodwithtech/dockle/releases/latest" | \
             grep '"tag_name":' | \
@@ -589,10 +579,6 @@ docker exec -it ubuntu-s6 /bin/bash
     }
 #+end_src
 
-#+RESULTS:
-: 1..1
-: ok 1 Check docker image
-
 ** 04.container_check.bats :test:
 :PROPERTIES:
 :CUSTOM_ID: 04-container-check-bats
@@ -600,8 +586,8 @@ docker exec -it ubuntu-s6 /bin/bash
 #+begin_src bats :results output pp :noweb strip-export
 
   setup() {
-      export IMAGE="${IMAGE:-oupfiz5/ubuntu-s6:latest}"
-      export CONTAINER_NAME="${CONTAINER_NAME:-ubuntu-s6}"
+      export IMAGE="${IMAGE:?Var IMAGE is null or unset. Exit.}"
+      export CONTAINER_NAME="${CONTAINER_NAME:?Var CONTAINER_NAME is null or unset. Exit.}"
   }
 
   @test "Verify container run" {
@@ -655,17 +641,6 @@ docker exec -it ubuntu-s6 /bin/bash
   }
 
 #+end_src
-
-#+RESULTS:
-: 1..8
-: ok 1 Verify container run
-: ok 2 Verify state status container - running
-: ok 3 Verify state running container - true
-: ok 4 Verify state restarting container - false
-: ok 5 Verify state error container - <empty>
-: ok 6 Verify restart count container - 0
-: ok 7 Verify AppArmor Profile - if applicable # skip
-: ok 8 Verify container stop
 
 ** shellcheck.sh :test:noexport:notangle:
 :PROPERTIES:

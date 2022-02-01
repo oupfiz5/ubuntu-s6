@@ -2,7 +2,7 @@
 load './helpers.bash'
 
 setup() {
-      IMAGE="${IMAGE:-oupfiz5/ubuntu-s6:latest}"
+      IMAGE="${IMAGE:?Var IMAGE is null or unset. Exit.}"
       VERSION=$(
       curl --silent "https://api.github.com/repos/goodwithtech/dockle/releases/latest" | \
           grep '"tag_name":' | \
