@@ -58,12 +58,12 @@ If you are reading this on GitHub, then you are looking at a Git mirror of the s
 :CUSTOM_ID: third-party-tools
 :END:
 They are using for testing and scanning:
-1. BATS
-2. Shellcheck
-3. Hadolynt
-4. Dockle
-5. Snyk
-6. Trivy
+1. [[https://github.com/bats-core][Bats]]
+2. [[https://www.shellcheck.net/][Shellcheck]]
+3. [[https://github.com/hadolint/hadolint][Hadolynt]]
+4. [[https://github.com/goodwithtech/dockle][Dockle]]
+5. Snyk - not necessarily
+6. Trivy - not necessarily
 * Installation
 :PROPERTIES:
 :CUSTOM_ID: installation
@@ -73,8 +73,7 @@ They are using for testing and scanning:
 :CUSTOM_ID: download-from-dockerhub
 :END:
 #+begin_example
-docker pull oupfiz5/ubuntu-s6:latest
-docker pull oupfiz5/ubuntu-s6:20.04
+docker pull oupfiz5/ubuntu-s6:20.04-3.1.0.0
 #+end_example
 
 ** Build from chiselapp (fossil)
@@ -124,7 +123,7 @@ timezone set the desired timezone with the variable TZ.
 docker run -itd --restart always \
            --name ubuntu-s6  \
            --env 'TZ=Europe/Moscow' \
-           oupfiz5/ubuntu-s6:latest
+           oupfiz5/ubuntu-s6:20.04-3.1.0.0
 #+end_example
 
 * Continues Integration
@@ -145,7 +144,7 @@ For debugging and maintenance purposes you may want access the output log. If yo
 #+begin_example
 docker run -it --rm \
        --name=ubuntu-s6 \
-       oupfiz5/ubuntu-s6:latest
+       oupfiz5/ubuntu-s6:20.04-3.1.0.0
 #+end_example
 
 ** Shell access
@@ -160,13 +159,48 @@ docker exec -it ubuntu-s6 /bin/bash
 :PROPERTIES:
 :CUSTOM_ID: code
 :END:
-** VERSION :code:
+** VERSIONS :code:
 :PROPERTIES:
-:CUSTOM_ID: version
+:CUSTOM_ID: versions
 :END:
 #+begin_src sh :shebang ""
-S6_OVERLAY_VERSION='3.0.0.0-1'
-UBUNTU_VERSION='20.04'
+    S6_OVERLAY_VERSION='3.0.0.2'
+    S6_OVERLAY_IMAGE_TAG='3.0.0.2'
+    UBUNTU_VERSION='20.04'
+#+end_src
+** ../.fossil-settings/crlf-glob
+:PROPERTIES:
+:CUSTOM_ID: ----fossil-settings-crlf-glob
+:END:
+#+begin_src sh :shebang ""
+  *
+#+end_src
+
+** ../.fossil-settings/crlf-glob.no-warn
+:PROPERTIES:
+:CUSTOM_ID: ----fossil-settings-crlf-glob-no-warn
+:END:
+#+begin_src sh :shebang ""
+  *
+#+end_src
+** ../.fossil-settings/ignore-glob
+:PROPERTIES:
+:CUSTOM_ID: ----fossil-settings-ignore-glob
+:END:
+#+begin_src sh :shebang ""
+  .git/
+  .github-mirroring/*
+  docs/
+  org/.configuration/*
+  tests/.bats-battery/*/.git
+  tests/.bats-battery/*/.github
+#+end_src
+** ../.fossil-settings/crlf-glob
+:PROPERTIES:
+:CUSTOM_ID: ----fossil-settings-crlf-glob
+:END:
+#+begin_src sh :shebang ""
+  *
 #+end_src
 ** ../.github/workflows/on-push.yaml :code:
 :PROPERTIES:
@@ -183,9 +217,10 @@ UBUNTU_VERSION='20.04'
       paths:
         - '.github/workflows/*'
         - '.github/*'
-        - 'src/Dockerfile'
+        - 'src/Dockerfile*'
         - 'src/rootfs/*'
         - 'src/hook/*'
+        - 'src/VERSIONS'
         - 'src/*.sh'
         - 'tests/**'
     pull_request:
@@ -238,7 +273,7 @@ UBUNTU_VERSION='20.04'
       paths:
         - '.github/workflows/*'
         - '.github/*'
-        - 'src/Dockerfile'
+        - 'src/Dockerfile*'
         - 'src/rootfs/*'
         - 'src/hook/*'
         - 'src/*.sh'
@@ -250,7 +285,7 @@ UBUNTU_VERSION='20.04'
       paths:
         - '.github/workflows/*'
         - '.github/*'
-        - 'src/Dockerfile'
+        - 'src/Dockerfile*'
         - 'src/rootfs/*'
         - 'src/hook/*'
         - 'src/*.sh'
@@ -290,16 +325,9 @@ UBUNTU_VERSION='20.04'
 
         - name: Build image
           run: |
-            cd ${GITHUB_WORKSPACE}/src
-            set -a; source VERSION ; set +a;
             export IMAGE="${REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}"
-            docker build \
-            --build-arg BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
-            --build-arg S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION}" \
-            --build-arg UBUNTU_VERSION="${UBUNTU_VERSION}" \
-            -t "${IMAGE}" \
-            -f ./Dockerfile \
-            .
+            cd ${GITHUB_WORKSPACE}/src/hook
+            ./build.sh
 
         - name: Check docker image (dockle)
           run: |
@@ -319,7 +347,7 @@ UBUNTU_VERSION='20.04'
 :CUSTOM_ID: ----github--trigger-on-push
 :END:
 #+begin_src sh :shebang ""
-  Trigger:4
+  Trigger:5
 #+end_src
 ** ../.gitignore :code:
 :PROPERTIES:
@@ -328,6 +356,7 @@ UBUNTU_VERSION='20.04'
 #+begin_src sh :shebang ""
   .fslckout
   .projectile
+  .fossil-settings/*
 #+end_src
 ** Dockerfile :code:
 :PROPERTIES:
@@ -339,7 +368,7 @@ UBUNTU_VERSION='20.04'
   FROM ubuntu:${UBUNTU_VERSION}
 
   # * Arguments
-  ARG S6_OVERLAY_VERSION=3.0.0.0-1 \
+  ARG S6_OVERLAY_VERSION=${S6_OVERLAY_VERSION:-3.0.0.2} \
       BUILD_DATE \
       UBUNTU_VERSION
 
@@ -399,9 +428,9 @@ UBUNTU_VERSION='20.04'
 :END:
 #+begin_src sh  :results output pp :noweb strip-export :dir ../src/hook
   # shellcheck disable=SC1091
-  set -a; source ../VERSION ; set +a;
+  set -a; source ../VERSIONS ; set +a;
 
-  IMAGE="${IMAGE:-oupfiz5/ubuntu-s6:${UBUNTU_VERSION}-{S6_OVERLAY_VERSION}}"
+  IMAGE="${IMAGE:-oupfiz5/ubuntu-s6:${UBUNTU_VERSION}-${S6_OVERLAY_IMAGE_TAG}}"
 
   docker build \
          --build-arg BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
@@ -410,6 +439,7 @@ UBUNTU_VERSION='20.04'
          -t "${IMAGE}" \
          -f ../Dockerfile \
           ../.
+
 #+end_src
 
 ** hook/push.sh :code:
@@ -418,13 +448,10 @@ UBUNTU_VERSION='20.04'
 :END:
 #+begin_src sh :results output pp :noweb strip-export :dir ../src/hook
   # shellcheck disable=SC1091
-  set -a; source ../VERSION ; set +a;
+  set -a; source ../VERSIONS ; set +a;
 
-  # CIS-DI-0005: Enable Content trust for Docker
-  # export DOCKER_CONTENT_TRUST=1
-
-  docker push oupfiz5/ubuntu-s6:"${UBUNTU_VERSION}-{S6_OVERLAY_VERSION}"
-  #docker push oupfiz5/ubuntu-s6:latest
+  IMAGE="${IMAGE:-oupfiz5/ubuntu-s6:${UBUNTU_VERSION}-${S6_OVERLAY_IMAGE_TAG}}"
+  docker push "${IMAGE}"
 #+end_src
 
 ** rootfs/etc/cont-finish.d/.gitignore :code:notangle:
@@ -505,17 +532,13 @@ UBUNTU_VERSION='20.04'
         assert_success
   }
 
-  @test "Check VERSION file" {
-        run export LC_ALL=C.UTF-8; shellcheck --shell=sh --exclude=SC2034 ../src/VERSION
+  @test "Check VERSIONS file" {
+        run export LC_ALL=C.UTF-8; shellcheck --shell=sh --exclude=SC2034 ../src/VERSIONS
         assert_success
   }
 
 #+end_src
 
-#+RESULTS:
-: 1..2
-: ok 1 Check shell files
-: ok 2 Check VERSION file
 
 ** 02.dockerfile_check.bats :test:
 :PROPERTIES:
@@ -530,9 +553,7 @@ UBUNTU_VERSION='20.04'
 
 #+end_src
 
-#+RESULTS:
-: 1..1
-: ok 1 Check Dockerfile
+
 ** 03.docker_image_check.bats :test:
 :PROPERTIES:
 :CUSTOM_ID: 03-docker-image-check-bats
@@ -541,7 +562,7 @@ UBUNTU_VERSION='20.04'
 #+begin_src bats :results output pp :noweb strip-export
 
   setup() {
-        IMAGE="${IMAGE:-oupfiz5/ubuntu-s6:latest}"
+        IMAGE="${IMAGE:?Var IMAGE is null or unset. Exit.}"
         VERSION=$(
         curl --silent "https://api.github.com/repos/goodwithtech/dockle/releases/latest" | \
             grep '"tag_name":' | \
@@ -561,10 +582,6 @@ UBUNTU_VERSION='20.04'
     }
 #+end_src
 
-#+RESULTS:
-: 1..1
-: ok 1 Check docker image
-
 ** 04.container_check.bats :test:
 :PROPERTIES:
 :CUSTOM_ID: 04-container-check-bats
@@ -572,8 +589,8 @@ UBUNTU_VERSION='20.04'
 #+begin_src bats :results output pp :noweb strip-export
 
   setup() {
-      export IMAGE="${IMAGE:-oupfiz5/ubuntu-s6:latest}"
-      export CONTAINER_NAME="${CONTAINER_NAME:-ubuntu-s6}"
+      export IMAGE="${IMAGE:?Var IMAGE is null or unset. Exit.}"
+      export CONTAINER_NAME="${CONTAINER_NAME:?Var CONTAINER_NAME is null or unset. Exit.}"
   }
 
   @test "Verify container run" {
@@ -627,17 +644,6 @@ UBUNTU_VERSION='20.04'
   }
 
 #+end_src
-
-#+RESULTS:
-: 1..8
-: ok 1 Verify container run
-: ok 2 Verify state status container - running
-: ok 3 Verify state running container - true
-: ok 4 Verify state restarting container - false
-: ok 5 Verify state error container - <empty>
-: ok 6 Verify restart count container - 0
-: ok 7 Verify AppArmor Profile - if applicable # skip
-: ok 8 Verify container stop
 
 ** shellcheck.sh :test:noexport:notangle:
 :PROPERTIES:
@@ -748,5 +754,5 @@ CIS-DI-0001
 :END:
 
 # Local Variables:
-##after-save-hook: (lambda nil (when (org-md-export-to-markdown) (rename-file "core.md" (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")) "src/" "Readme.md" )  t )))
+#after-save-hook: (lambda nil (when (org-md-export-to-markdown) (rename-file "core.md" (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")) "src/" "Readme.md" )  t )))
 # End:
