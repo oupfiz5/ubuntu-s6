@@ -538,24 +538,6 @@ docker exec -it ubuntu-s6 /bin/bash
 
 #+end_src
 
-<<<<<<< BEGIN MERGE CONFLICT: local copy shown first <<<<<<<<<<<<<<<
-<<<<<<< BEGIN MERGE CONFLICT: local copy shown first <<<<<<<<<<<<<<<
-||||||| COMMON ANCESTOR content follows ||||||||||||||||||||||||||||
-#+RESULTS:
-: 1..2
-: ok 1 Check shell files
-: ok 2 Check VERSION file
-||||||| COMMON ANCESTOR content follows ||||||||||||||||||||||||||||
-#+RESULTS:
-: 1..2
-: ok 1 Check shell files
-: ok 2 Check VERSION file
-======= MERGED IN content follows ==================================
->>>>>>> END MERGE CONFLICT >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-======= MERGED IN content follows ==================================
-
->>>>>>> END MERGE CONFLICT >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ** 02.dockerfile_check.bats :test:
 :PROPERTIES:
 :CUSTOM_ID: 02-dockerfile-check-bats
@@ -569,22 +551,6 @@ docker exec -it ubuntu-s6 /bin/bash
 
 #+end_src
 
-<<<<<<< BEGIN MERGE CONFLICT: local copy shown first <<<<<<<<<<<<<<<
-<<<<<<< BEGIN MERGE CONFLICT: local copy shown first <<<<<<<<<<<<<<<
-||||||| COMMON ANCESTOR content follows ||||||||||||||||||||||||||||
-#+RESULTS:
-: 1..1
-: ok 1 Check Dockerfile
-||||||| COMMON ANCESTOR content follows ||||||||||||||||||||||||||||
-#+RESULTS:
-: 1..1
-: ok 1 Check Dockerfile
-======= MERGED IN content follows ==================================
-
->>>>>>> END MERGE CONFLICT >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-======= MERGED IN content follows ==================================
-
->>>>>>> END MERGE CONFLICT >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ** 03.docker_image_check.bats :test:
 :PROPERTIES:
 :CUSTOM_ID: 03-docker-image-check-bats
