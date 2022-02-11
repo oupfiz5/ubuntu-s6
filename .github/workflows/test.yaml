@@ -1,4 +1,4 @@
-name: Tests
+name: Check and Tests
 
 # * Controls
 # Controls when the action will run.
@@ -29,17 +29,10 @@ on:
       - 'main'
   workflow_dispatch:
 
-# * Environments
-env:
-  CONTAINER_NAME: "ubuntu-s6"
-  IMAGE_NAME: "ubuntu-s6"
-  IMAGE_TAG: "${{ github.sha }}"
-  REPOSITORY: "oupfiz5"
-
 # * Jobs
 jobs:
   checks:
-    name: Checks
+    name: Checks and Tests
     runs-on: ubuntu-20.04
     steps:
       - name: Repo checkout
@@ -55,22 +48,50 @@ jobs:
       - name: Check Dockerfile (hadolint)
         run: |
           cd ${GITHUB_WORKSPACE}/tests
+          echo "::group::Check Dockerfile"
           .bats-battery/bats-core/bin/bats 02.dockerfile_check.bats
+          echo "::endgroup::"
 
-      - name: Build image
+          echo "::group::Check Dockerfile.s6v2"
+          export DOCKERFILE='Dockerfile.s6v2'
+          .bats-battery/bats-core/bin/bats 02.dockerfile_check.bats
+          echo "::endgroup::"
+
+      - name: s6v3. Build and check image and container.
         run: |
-          export IMAGE="${REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}"
+          echo "::group::Build image"
+          set -a; source ${GITHUB_WORKSPACE}/src/VERSIONS ; set +a;
+          export IMAGE="${IMAGE:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}}"
+          echo "Build image"
           cd ${GITHUB_WORKSPACE}/src/hook
           ./build.sh
-
-      - name: Check docker image (dockle)
-        run: |
+          echo "::endgroup::"
+          echo "::group::Check image and container"
           cd ${GITHUB_WORKSPACE}/tests
-          export IMAGE="${REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}"
+          echo "Check docker image (dockle)"
           .bats-battery/bats-core/bin/bats 03.docker_image_check.bats
-
-      - name: Check docker container
-        run: |
-          cd ${GITHUB_WORKSPACE}/tests
-          export IMAGE="${REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}"
+          echo "Check docker container"
           .bats-battery/bats-core/bin/bats 04.container_check.bats
+          echo "::endgroup::"
+
+      - name: s6v2. Build and check image and container.
+        run: |
+          echo "::group::Build image"
+          export S6_OVERLAY_VERSION='2.2.0.3'
+          export S6_OVERLAY_IMAGE_TAG='2.2.0.3'
+          export DOCKERFILE='Dockerfile.s6v2'
+
+          set -a; source ${GITHUB_WORKSPACE}/src/VERSIONS ; set +a;
+          export IMAGE="${IMAGE:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}}"
+          echo "Build image"
+          cd ${GITHUB_WORKSPACE}/src/hook
+          ./build.sh
+          echo "::endgroup::"
+
+          echo "::group::Check image and container"
+          cd ${GITHUB_WORKSPACE}/tests
+          echo "Check docker image (dockle)"
+          .bats-battery/bats-core/bin/bats 03.docker_image_check.bats
+          echo "Check docker container"
+          .bats-battery/bats-core/bin/bats 04.container_check.bats
+          echo "::endgroup::"

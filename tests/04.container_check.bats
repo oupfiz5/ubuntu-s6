@@ -2,8 +2,8 @@
 load './helpers.bash'
 
 setup() {
-    export IMAGE="${IMAGE:?Var IMAGE is null or unset. Exit.}"
-    export CONTAINER_NAME="${CONTAINER_NAME:?Var CONTAINER_NAME is null or unset. Exit.}"
+    . ../src/VERSIONS
+    IMAGE="${IMAGE:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}}"
 }
 
 @test "Verify container run" {

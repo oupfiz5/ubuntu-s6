@@ -39,12 +39,28 @@ jobs:
         run: |
           echo  ${{ secrets.DOCKERHUB_TOKEN }} | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
-      - name: Build images
+      - name: s6v3. Build images
         run: |
           cd ${GITHUB_WORKSPACE}/src/hook
           ./build.sh
 
-      - name: Push images
+      - name: s6v3. Push images
         run: |
+          cd ${GITHUB_WORKSPACE}/src/hook
+          ./push.sh
+
+      - name: s6v3. Build images
+        run: |
+          cd ${GITHUB_WORKSPACE}/src/hook
+          export S6_OVERLAY_VERSION='2.2.0.3'
+          export S6_OVERLAY_IMAGE_TAG='2.2.0.3'
+          export DOCKERFILE='Dockerfile.s6v2'
+          ./build.sh
+
+      - name: s6v3. Push images
+        run: |
+          export S6_OVERLAY_VERSION='2.2.0.3'
+          export S6_OVERLAY_IMAGE_TAG='2.2.0.3'
+          export DOCKERFILE='Dockerfile.s6v2'
           cd ${GITHUB_WORKSPACE}/src/hook
           ./push.sh
