@@ -268,7 +268,7 @@ docker exec -it ubuntu-s6 /bin/bash
 :CUSTOM_ID: ----github-workflows-test-yaml
 :END:
 #+begin_src yaml :shebang ""
-  name: Tests
+  name: Check and Tests
 
   # * Controls
   # Controls when the action will run.
@@ -302,7 +302,7 @@ docker exec -it ubuntu-s6 /bin/bash
   # * Jobs
   jobs:
     checks:
-      name: Checks
+      name: Checks and Tests
       runs-on: ubuntu-20.04
       steps:
         - name: Repo checkout
@@ -328,7 +328,7 @@ docker exec -it ubuntu-s6 /bin/bash
         #     echo "::endgroup::"
 
 
-        - name: s6v3. Build and check image and container.
+        - name: Build and check image and container.
           run: |
             echo "::group::Build image"
             set -a; source ${GITHUB_WORKSPACE}/src/VERSIONS ; set +a;

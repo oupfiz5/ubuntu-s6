@@ -1,4 +1,4 @@
-name: Tests
+name: Check and Tests
 
 # * Controls
 # Controls when the action will run.
@@ -32,7 +32,7 @@ on:
 # * Jobs
 jobs:
   checks:
-    name: Checks
+    name: Checks and Tests
     runs-on: ubuntu-20.04
     steps:
       - name: Repo checkout
@@ -58,7 +58,7 @@ jobs:
       #     echo "::endgroup::"
 
 
-      - name: s6v3. Build and check image and container.
+      - name: Build and check image and container.
         run: |
           echo "::group::Build image"
           set -a; source ${GITHUB_WORKSPACE}/src/VERSIONS ; set +a;
