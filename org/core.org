@@ -164,12 +164,12 @@ docker exec -it ubuntu-s6 /bin/bash
 :CUSTOM_ID: versions
 :END:
 #+begin_src sh :shebang ""
-  CONTAINER_NAME='ubuntu-s6'
-  S6_OVERLAY_VERSION='3.0.0.2'
-  S6_OVERLAY_IMAGE_TAG='3.0.0.2'
-  UBUNTU_VERSION='20.04'
-  IMAGE_NAME='ubuntu-s6'
-  IMAGE_REPOSITORY='oupfiz5'
+  CONTAINER_NAME="${CONTAINER_NAME:-ubuntu-s6}"
+  S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION:-3.0.0.2}"
+  S6_OVERLAY_IMAGE_TAG="${S6_OVERLAY_IMAGE_TAG:-3.0.0.2}"
+  UBUNTU_VERSION="${UBUNTU_VERSION:-20.04}"
+  IMAGE_NAME="${IMAGE_NAME:-ubuntu-s6}"
+  IMAGE_REPOSITORY="${IMAGE_REPOSITORY:-oupfiz5}"
   IMAGE_TAG="${UBUNTU_VERSION}-${S6_OVERLAY_IMAGE_TAG}"
 #+end_src
 ** ../.fossil-settings/crlf-glob
@@ -318,9 +318,15 @@ docker exec -it ubuntu-s6 /bin/bash
         - name: Check Dockerfile (hadolint)
           run: |
             cd ${GITHUB_WORKSPACE}/tests
+            echo "::group::Check Dockerfile"
             .bats-battery/bats-core/bin/bats 02.dockerfile_check.bats
+            echo "::endgroup::"
+            echo "::group::Check Dockerfile.s6v2"
+            DOCKERFILE=Dockerfile.s6v2
+            .bats-battery/bats-core/bin/bats 02.dockerfile_check.bats
+            echo "::endgroup::"
 
-        - name: Build and check image and container.
+        - name: s6v3. Build and check image and container.
           run: |
             echo "::group::Build image"
             set -a; source ${GITHUB_WORKSPACE}/src/VERSIONS ; set +a;
@@ -337,6 +343,27 @@ docker exec -it ubuntu-s6 /bin/bash
             echo "Check docker container"
             .bats-battery/bats-core/bin/bats 04.container_check.bats
             echo "::endgroup::"
+
+          - name: s6v2. Build and check image and container.
+            run: |
+              echo "::group::Build image"
+              set -a; source ${GITHUB_WORKSPACE}/src/VERSIONS ; set +a;
+              export S6_OVERLAY_VERSION=2.2.0.3
+              export S6_OVERLAY_IMAGE_TAG=2.2.0.3
+              export DOCKERFILE=Dockerfile.s6v2
+              export IMAGE="${IMAGE:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}}"
+              echo "Build image"
+              cd ${GITHUB_WORKSPACE}/src/hook
+              ./build.sh
+              echo "::endgroup::"
+
+              echo "::group::Check image and container"
+              cd ${GITHUB_WORKSPACE}/tests
+              echo "Check docker image (dockle)"
+              .bats-battery/bats-core/bin/bats 03.docker_image_check.bats
+              echo "Check docker container"
+              .bats-battery/bats-core/bin/bats 04.container_check.bats
+              echo "::endgroup::"
 #+end_src
 
 ** ../.github/.trigger_on_push :code:
@@ -414,6 +441,59 @@ docker exec -it ubuntu-s6 /bin/bash
       rm /tmp/s6-overlay-symlinks-noarch-${S6_OVERLAY_VERSION}.tar.xz && \
       rm /tmp/s6-overlay-symlinks-arch-${S6_OVERLAY_VERSION}.tar.xz
 
+
+  # * Entrypoint
+  ENTRYPOINT ["/init"]
+#+end_src
+** Dockerfile.s6v2 :code:
+:PROPERTIES:
+:CUSTOM_ID: dockerfile-s6v2
+:END:
+#+begin_src sh :shebang ""
+  # * Base image
+  ARG UBUNTU_VERSION="${UBUNTU_VERSION}"
+  FROM ubuntu:${UBUNTU_VERSION}
+
+  # * Arguments
+  ARG S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION}" \
+      BUILD_DATE="${BUILD_DATE}"
+
+  # * Labels
+  LABEL \
+      maintainer="Oupfiz V <oupfiz5@yandex.ru>" \
+      org.opencontainers.image.created="${BUILD_DATE}" \
+      org.opencontainers.image.authors="Oupfiz V (Five)" \
+      org.opencontainers.image.url="https://chiselapp.com/user/oupfiz5/repository/ubuntu-s6/home" \
+      org.opencontainers.image.documentation="https://chiselapp.com/user/oupfiz5/repository/ubuntu-s6/wiki" \
+      org.opencontainers.image.source="https://chiselapp.com/user/oupfiz5/repository/ubuntu-s6/brlist" \
+      org.opencontainers.image.version="0.0.4d" \
+      org.opencontainers.image.revision="" \
+      org.opencontainers.image.vendor="" \
+      org.opencontainers.image.licenses="" \
+      org.opencontainers.image.ref.name="" \
+      org.opencontainers.image.title="Ubuntu image with s6 init system" \
+      org.opencontainers.image.description="Ubuntu base docker image using s6-overlay" \
+      org.opencontainers.ubuntu.version="${UBUNTU_VERSION}" \
+      org.opencontainers.s6overlay.version="${S6_OVERLAY_VERSION}"
+
+  # * Environment
+
+  # * Copy
+  COPY rootfs/ /
+
+  # * Add
+  ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-amd64.tar.gz /tmp/s6-overlay.tar.gz
+
+  # * Run
+  # hadolint ignore=DL3008,DL3003
+  RUN apt-get update && \
+      DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata --no-install-recommends && \
+      apt-get clean && \
+      rm -rf /var/lib/apt/lists/* && \
+      cd /tmp && \
+      tar xzf /tmp/s6-overlay.tar.gz -C / --exclude='./bin' && \
+      tar xzf /tmp/s6-overlay.tar.gz -C /usr ./bin && \
+      rm /tmp/s6-overlay.tar.gz
 
   # * Entrypoint
   ENTRYPOINT ["/init"]
