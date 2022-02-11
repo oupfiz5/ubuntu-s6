@@ -322,10 +322,10 @@ docker exec -it ubuntu-s6 /bin/bash
             .bats-battery/bats-core/bin/bats 02.dockerfile_check.bats
             echo "::endgroup::"
 
-            echo "::group::Check Dockerfile.s6v2"
-            export DOCKERFILE='Dockerfile.s6v2'
-            .bats-battery/bats-core/bin/bats 02.dockerfile_check.bats
-            echo "::endgroup::"
+        #     echo "::group::Check Dockerfile.s6v2"
+        #     export DOCKERFILE='Dockerfile.s6v2'
+        #     .bats-battery/bats-core/bin/bats 02.dockerfile_check.bats
+        #     echo "::endgroup::"
 
         - name: s6v3. Build and check image and container.
           run: |
