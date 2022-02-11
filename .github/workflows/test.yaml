@@ -52,7 +52,7 @@ jobs:
           .bats-battery/bats-core/bin/bats 02.dockerfile_check.bats
           echo "::endgroup::"
           echo "::group::Check Dockerfile.s6v2"
-          export DOCKERFILE=Dockerfile.s6v2
+          export DOCKERFILE='Dockerfile.s6v2'
           .bats-battery/bats-core/bin/bats 02.dockerfile_check.bats
           echo "::endgroup::"
 
@@ -78,9 +78,9 @@ jobs:
           run: |
             echo "::group::Build image"
             set -a; source ${GITHUB_WORKSPACE}/src/VERSIONS ; set +a;
-            export S6_OVERLAY_VERSION=2.2.0.3
-            export S6_OVERLAY_IMAGE_TAG=2.2.0.3
-            export DOCKERFILE=Dockerfile.s6v2
+            export S6_OVERLAY_VERSION='2.2.0.3'
+            export S6_OVERLAY_IMAGE_TAG='2.2.0.3'
+            export DOCKERFILE='Dockerfile.s6v2'
             export IMAGE="${IMAGE:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}}"
             echo "Build image"
             cd ${GITHUB_WORKSPACE}/src/hook
