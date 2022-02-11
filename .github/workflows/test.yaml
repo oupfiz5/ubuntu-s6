@@ -74,18 +74,18 @@ jobs:
           .bats-battery/bats-core/bin/bats 04.container_check.bats
           echo "::endgroup::"
 
-      #   - name: s6v2. Build and check image and container.
-      #     run: |
-      #       echo "::group::Build image"
-      #       set -a; source ${GITHUB_WORKSPACE}/src/VERSIONS ; set +a;
-      #       export S6_OVERLAY_VERSION='2.2.0.3'
-      #       export S6_OVERLAY_IMAGE_TAG='2.2.0.3'
-      #       export DOCKERFILE='Dockerfile.s6v2'
-      #       export IMAGE="${IMAGE:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}}"
-      #       echo "Build image"
-      #       cd ${GITHUB_WORKSPACE}/src/hook
-      #       ./build.sh
-      #       echo "::endgroup::"
+        - name: s6v2. Build and check image and container.
+          run: |
+            echo "::group::Build image"
+            export S6_OVERLAY_VERSION='2.2.0.3'
+            export S6_OVERLAY_IMAGE_TAG='2.2.0.3'
+            export DOCKERFILE='Dockerfile.s6v2'
+            set -a; source ${GITHUB_WORKSPACE}/src/VERSIONS ; set +a;
+            export IMAGE="${IMAGE:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}}"
+            echo "Build image"
+            cd ${GITHUB_WORKSPACE}/src/hook
+            ./build.sh
+            echo "::endgroup::"
 
       #       echo "::group::Check image and container"
       #       cd ${GITHUB_WORKSPACE}/tests
