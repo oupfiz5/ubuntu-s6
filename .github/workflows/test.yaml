@@ -45,17 +45,17 @@ jobs:
           cd ${GITHUB_WORKSPACE}/tests
           .bats-battery/bats-core/bin/bats 01.shellchecks.bats
 
-      # - name: Check Dockerfile (hadolint)
-      #   run: |
-      #     cd ${GITHUB_WORKSPACE}/tests
-      #     #echo "::group::Check Dockerfile"
-      #     .bats-battery/bats-core/bin/bats 02.dockerfile_check.bats
-      #     #echo "::endgroup::"
+      - name: Check Dockerfile (hadolint)
+        run: |
+          cd ${GITHUB_WORKSPACE}/tests
+          echo "::group::Check Dockerfile"
+          .bats-battery/bats-core/bin/bats 02.dockerfile_check.bats
+          echo "::endgroup::"
 
-      #     #echo "::group::Check Dockerfile.s6v2"
-      #     export DOCKERFILE='Dockerfile.s6v2'
-      #     .bats-battery/bats-core/bin/bats 02.dockerfile_check.bats
-      #     #echo "::endgroup::"
+          echo "::group::Check Dockerfile.s6v2"
+          export DOCKERFILE='Dockerfile.s6v2'
+          .bats-battery/bats-core/bin/bats 02.dockerfile_check.bats
+          echo "::endgroup::"
 
       # - name: Build and check image and container.
       #   run: |
