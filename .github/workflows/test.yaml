@@ -29,13 +29,6 @@ on:
       - 'main'
   workflow_dispatch:
 
-# * Environments
-env:
-  CONTAINER_NAME: "ubuntu-s6"
-  IMAGE_NAME: "ubuntu-s6"
-  IMAGE_TAG: "${{ github.sha }}"
-  REPOSITORY: "oupfiz5"
-
 # * Jobs
 jobs:
   checks:
@@ -57,20 +50,20 @@ jobs:
           cd ${GITHUB_WORKSPACE}/tests
           .bats-battery/bats-core/bin/bats 02.dockerfile_check.bats
 
-      - name: Build image
+      - name: Build and check image and container.
         run: |
-          export IMAGE="${REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}"
+          echo "::group::Build image"
+          set -a; source ${GITHUB_WORKSPACE}/src/VERSIONS ; set +a;
+          export IMAGE="${IMAGE:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}}"
+          echo "Build image"
           cd ${GITHUB_WORKSPACE}/src/hook
           ./build.sh
+          echo "::endgroup::"
 
-      - name: Check docker image (dockle)
-        run: |
+          echo "::group::Check image and container"
           cd ${GITHUB_WORKSPACE}/tests
-          export IMAGE="${REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}"
+          echo "Check docker image (dockle)"
           .bats-battery/bats-core/bin/bats 03.docker_image_check.bats
-
-      - name: Check docker container
-        run: |
-          cd ${GITHUB_WORKSPACE}/tests
-          export IMAGE="${REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}"
+          echo "Check docker container"
           .bats-battery/bats-core/bin/bats 04.container_check.bats
+          echo "::endgroup::"

@@ -164,9 +164,13 @@ docker exec -it ubuntu-s6 /bin/bash
 :CUSTOM_ID: versions
 :END:
 #+begin_src sh :shebang ""
-    S6_OVERLAY_VERSION='3.0.0.2'
-    S6_OVERLAY_IMAGE_TAG='3.0.0.2'
-    UBUNTU_VERSION='20.04'
+  CONTAINER_NAME='ubuntu-s6'
+  S6_OVERLAY_VERSION='3.0.0.2'
+  S6_OVERLAY_IMAGE_TAG='3.0.0.2'
+  UBUNTU_VERSION='20.04'
+  IMAGE_NAME='ubuntu-s6'
+  IMAGE_REPOSITORY='oupfiz5'
+  IMAGE_TAG="${UBUNTU_VERSION}-${S6_OVERLAY_IMAGE_TAG}"
 #+end_src
 ** ../.fossil-settings/crlf-glob
 :PROPERTIES:
@@ -295,13 +299,6 @@ docker exec -it ubuntu-s6 /bin/bash
         - 'main'
     workflow_dispatch:
 
-  # * Environments
-  env:
-    CONTAINER_NAME: "ubuntu-s6"
-    IMAGE_NAME: "ubuntu-s6"
-    IMAGE_TAG: "${{ github.sha }}"
-    REPOSITORY: "oupfiz5"
-
   # * Jobs
   jobs:
     checks:
@@ -323,23 +320,23 @@ docker exec -it ubuntu-s6 /bin/bash
             cd ${GITHUB_WORKSPACE}/tests
             .bats-battery/bats-core/bin/bats 02.dockerfile_check.bats
 
-        - name: Build image
+        - name: Build and check image and container.
           run: |
-            export IMAGE="${REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}"
+            echo "::group::Build image"
+            set -a; source ${GITHUB_WORKSPACE}/src/VERSIONS ; set +a;
+            export IMAGE="${IMAGE:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}}"
+            echo "Build image"
             cd ${GITHUB_WORKSPACE}/src/hook
             ./build.sh
+            echo "::endgroup::"
 
-        - name: Check docker image (dockle)
-          run: |
+            echo "::group::Check image and container"
             cd ${GITHUB_WORKSPACE}/tests
-            export IMAGE="${REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}"
+            echo "Check docker image (dockle)"
             .bats-battery/bats-core/bin/bats 03.docker_image_check.bats
-
-        - name: Check docker container
-          run: |
-            cd ${GITHUB_WORKSPACE}/tests
-            export IMAGE="${REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}"
+            echo "Check docker container"
             .bats-battery/bats-core/bin/bats 04.container_check.bats
+            echo "::endgroup::"
 #+end_src
 
 ** ../.github/.trigger_on_push :code:
@@ -364,13 +361,12 @@ docker exec -it ubuntu-s6 /bin/bash
 :END:
 #+begin_src sh :shebang ""
   # * Base image
-  ARG UBUNTU_VERSION=20.04
+  ARG UBUNTU_VERSION="${UBUNTU_VERSION}"
   FROM ubuntu:${UBUNTU_VERSION}
 
   # * Arguments
-  ARG S6_OVERLAY_VERSION=${S6_OVERLAY_VERSION:-3.0.0.2} \
-      BUILD_DATE \
-      UBUNTU_VERSION
+  ARG S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION}" \
+      BUILD_DATE="${BUILD_DATE}"
 
   # * Labels
   LABEL \
@@ -430,14 +426,15 @@ docker exec -it ubuntu-s6 /bin/bash
   # shellcheck disable=SC1091
   set -a; source ../VERSIONS ; set +a;
 
-  IMAGE="${IMAGE:-oupfiz5/ubuntu-s6:${UBUNTU_VERSION}-${S6_OVERLAY_IMAGE_TAG}}"
+  IMAGE="${IMAGE:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}}"
+  DOCKERFILE="${DOCKERFILE:-Dockerfile}"
 
   docker build \
          --build-arg BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
          --build-arg S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION}" \
          --build-arg UBUNTU_VERSION="${UBUNTU_VERSION}" \
          -t "${IMAGE}" \
-         -f ../Dockerfile \
+         -f ../"${DOCKERFILE}" \
           ../.
 
 #+end_src
@@ -450,7 +447,8 @@ docker exec -it ubuntu-s6 /bin/bash
   # shellcheck disable=SC1091
   set -a; source ../VERSIONS ; set +a;
 
-  IMAGE="${IMAGE:-oupfiz5/ubuntu-s6:${UBUNTU_VERSION}-${S6_OVERLAY_IMAGE_TAG}}"
+  IMAGE="${IMAGE:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}}"
+
   docker push "${IMAGE}"
 #+end_src
 
@@ -559,7 +557,9 @@ docker exec -it ubuntu-s6 /bin/bash
 #+begin_src bats :results output pp :noweb strip-export
 
   setup() {
-        IMAGE="${IMAGE:?Var IMAGE is null or unset. Exit.}"
+        . ../src/VERSIONS
+        IMAGE="${IMAGE:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}}"
+
         VERSION=$(
         curl --silent "https://api.github.com/repos/goodwithtech/dockle/releases/latest" | \
             grep '"tag_name":' | \
@@ -586,8 +586,8 @@ docker exec -it ubuntu-s6 /bin/bash
 #+begin_src bats :results output pp :noweb strip-export
 
   setup() {
-      export IMAGE="${IMAGE:?Var IMAGE is null or unset. Exit.}"
-      export CONTAINER_NAME="${CONTAINER_NAME:?Var CONTAINER_NAME is null or unset. Exit.}"
+      . ../src/VERSIONS
+      IMAGE="${IMAGE:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}}"
   }
 
   @test "Verify container run" {
