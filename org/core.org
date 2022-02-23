@@ -226,6 +226,7 @@ docker exec -it ubuntu-s6 /bin/bash
         - 'src/hook/*'
         - 'src/VERSIONS'
         - 'src/*.sh'
+        - 'src/VERSIONS'
         - 'tests/**'
     pull_request:
       branches:
@@ -238,6 +239,7 @@ docker exec -it ubuntu-s6 /bin/bash
         - 'src/rootfs/*'
         - 'src/hook/*'
         - 'src/*.sh'
+        - 'src/VERSIONS'
         - 'tests/**'
 
   jobs:
@@ -286,6 +288,7 @@ docker exec -it ubuntu-s6 /bin/bash
         - 'src/rootfs/*'
         - 'src/hook/*'
         - 'src/*.sh'
+        - 'src/VERSIONS'
         - 'tests/**'
       branches-ignore:
         - 'master'
@@ -298,6 +301,7 @@ docker exec -it ubuntu-s6 /bin/bash
         - 'src/rootfs/*'
         - 'src/hook/*'
         - 'src/*.sh'
+        - 'src/VERSIONS'
         - 'tests/**'
       branches-ignore:
         - 'master'
