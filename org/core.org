@@ -165,8 +165,8 @@ docker exec -it ubuntu-s6 /bin/bash
 :END:
 #+begin_src sh :shebang ""
   CONTAINER_NAME="${CONTAINER_NAME:-ubuntu-s6}"
-  S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION:-3.0.0.2}"
-  S6_OVERLAY_IMAGE_TAG="${S6_OVERLAY_IMAGE_TAG:-3.0.0.2}"
+  S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION:-3.0.0.2-2}"
+  S6_OVERLAY_IMAGE_TAG="${S6_OVERLAY_IMAGE_TAG:-3.0.0.2-2}"
   UBUNTU_VERSION="${UBUNTU_VERSION:-20.04}"
   IMAGE_NAME="${IMAGE_NAME:-ubuntu-s6}"
   IMAGE_REPOSITORY="${IMAGE_REPOSITORY:-oupfiz5}"
@@ -226,6 +226,7 @@ docker exec -it ubuntu-s6 /bin/bash
         - 'src/hook/*'
         - 'src/VERSIONS'
         - 'src/*.sh'
+        - 'src/VERSIONS'
         - 'tests/**'
     pull_request:
       branches:
@@ -238,6 +239,7 @@ docker exec -it ubuntu-s6 /bin/bash
         - 'src/rootfs/*'
         - 'src/hook/*'
         - 'src/*.sh'
+        - 'src/VERSIONS'
         - 'tests/**'
 
   jobs:
@@ -286,6 +288,7 @@ docker exec -it ubuntu-s6 /bin/bash
         - 'src/rootfs/*'
         - 'src/hook/*'
         - 'src/*.sh'
+        - 'src/VERSIONS'
         - 'tests/**'
       branches-ignore:
         - 'master'
@@ -298,6 +301,7 @@ docker exec -it ubuntu-s6 /bin/bash
         - 'src/rootfs/*'
         - 'src/hook/*'
         - 'src/*.sh'
+        - 'src/VERSIONS'
         - 'tests/**'
       branches-ignore:
         - 'master'
