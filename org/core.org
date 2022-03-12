@@ -165,8 +165,8 @@ docker exec -it ubuntu-s6 /bin/bash
 :END:
 #+begin_src sh :shebang ""
   CONTAINER_NAME="${CONTAINER_NAME:-ubuntu-s6}"
-  S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION:-3.0.0.2-2}"
-  S6_OVERLAY_IMAGE_TAG="${S6_OVERLAY_IMAGE_TAG:-3.0.0.2-2}"
+  S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION:-3.1.0.1}"
+  S6_OVERLAY_IMAGE_TAG="${S6_OVERLAY_IMAGE_TAG:-3.1.0.1}"
   UBUNTU_VERSION="${UBUNTU_VERSION:-20.04}"
   IMAGE_NAME="${IMAGE_NAME:-ubuntu-s6}"
   IMAGE_REPOSITORY="${IMAGE_REPOSITORY:-oupfiz5}"
@@ -838,7 +838,8 @@ CIS-DI-0001
     - Snyk
   - Trivy
 - add report security artifacts
-* Local hooks :noexport:
+
+* TODO Local hooks :noexport:
 :PROPERTIES:
 :CUSTOM_ID: local-hooks
 :END:
