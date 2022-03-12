@@ -838,7 +838,8 @@ CIS-DI-0001
     - Snyk
   - Trivy
 - add report security artifacts
-* Local hooks :noexport:
+
+* TODO Local hooks :noexport:
 :PROPERTIES:
 :CUSTOM_ID: local-hooks
 :END:
