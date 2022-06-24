@@ -165,8 +165,8 @@ docker exec -it ubuntu-s6 /bin/bash
 :END:
 #+begin_src sh :shebang ""
   CONTAINER_NAME="${CONTAINER_NAME:-ubuntu-s6}"
-  S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION:-3.1.0.1}"
-  S6_OVERLAY_IMAGE_TAG="${S6_OVERLAY_IMAGE_TAG:-3.1.0.1}"
+  S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION:-3.1.1.1}"
+  S6_OVERLAY_IMAGE_TAG="${S6_OVERLAY_IMAGE_TAG:-3.1.1.1}"
   UBUNTU_VERSION="${UBUNTU_VERSION:-20.04}"
   IMAGE_NAME="${IMAGE_NAME:-ubuntu-s6}"
   IMAGE_REPOSITORY="${IMAGE_REPOSITORY:-oupfiz5}"
@@ -838,12 +838,3 @@ CIS-DI-0001
     - Snyk
   - Trivy
 - add report security artifacts
-
-* TODO Local hooks :noexport:
-:PROPERTIES:
-:CUSTOM_ID: local-hooks
-:END:
-
-# Local Variables:
-#after-save-hook: (lambda nil (when (org-md-export-to-markdown) (rename-file "core.md" (concat (file-name-directory (mapconcat 'identity (split-string  buffer-file-name "org/") "")) "src/" "Readme.md" )  t )))
-# End:
