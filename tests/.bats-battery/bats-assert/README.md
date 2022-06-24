@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/npm/l/bats-assert.svg)](https://github.com/bats-core/bats-assert/blob/master/LICENSE)
 [![GitHub release](https://img.shields.io/github/release/bats-core/bats-assert.svg)](https://github.com/bats-core/bats-assert/releases/latest)
 [![npm release](https://img.shields.io/npm/v/bats-assert.svg)](https://www.npmjs.com/package/bats-assert)
-[![Build Status](https://travis-ci.org/bats-core/bats-assert.svg?branch=master)](https://travis-ci.org/bats-core/bats-assert)
+[![Tests](https://github.com/bats-core/bats-assert/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/bats-core/bats-assert/actions/workflows/tests.yml)
 
 `bats-assert` is a helper library providing common assertions for [Bats][bats].
 
@@ -34,9 +34,11 @@ This project provides the following functions:
 
  - [assert](#assert) / [refute](#refute) Assert a given expression evaluates to `true` or `false`.
  - [assert_equal](#assert_equal) Assert two parameters are equal.
+ - [assert_not_equal](#assert_not_equal) Assert two parameters are not equal.
  - [assert_success](#assert_success) / [assert_failure](#assert_failure) Assert exit status is `0` or `1`.
  - [assert_output](#assert_output) / [refute_output](#refute_output) Assert output does (or does not) contain given content.
  - [assert_line](#assert_line) / [refute_line](#refute_line) Assert a specific line of output does (or does not) contain given content.
+ - [assert_regex](#assert_regex) / [refute_regex](#refute_regex) Assert a parameter does (or does not) match given pattern.
 
 These commands are described in more detail below.
 
@@ -67,8 +69,7 @@ Fail if the given expression evaluates to false.
 
 ```bash
 @test 'assert()' {
-  touch '/var/log/test.log'
-  assert [ -e '/var/log/test.log' ]
+  assert [ 1 -lt 0 ]
 }
 ```
 
@@ -76,7 +77,7 @@ On failure, the failed expression is displayed.
 
 ```
 -- assertion failed --
-expression : [ -e /var/log/test.log ]
+expression : [ 1 -lt 0 ]
 --
 ```
 
@@ -91,8 +92,7 @@ Fail if the given expression evaluates to true.
 
 ```bash
 @test 'refute()' {
-  rm -f '/var/log/test.log'
-  refute [ -e '/var/log/test.log' ]
+  refute [ 1 -gt 0 ]
 }
 ```
 
@@ -100,7 +100,7 @@ On failure, the successful expression is displayed.
 
 ```
 -- assertion succeeded, but it was expected to fail --
-expression : [ -e /var/log/test.log ]
+expression : [ 1 -gt 0 ]
 --
 ```
 
@@ -121,6 +121,28 @@ On failure, the expected and actual values are displayed.
 -- values do not equal --
 expected : want
 actual   : have
+--
+```
+
+If either value is longer than one line both are displayed in *multi-line* format.
+
+
+### `assert_not_equal`
+
+Fail if the two parameters, actual and unexpected value respectively, are equal.
+
+```bash
+@test 'assert_not_equal()' {
+  assert_not_equal 'foobar' 'foobar'
+}
+```
+
+On failure, the expected and actual values are displayed.
+
+```
+-- values should not be equal --
+unexpected : foobar
+actual     : foobar
 --
 ```
 
@@ -672,10 +694,89 @@ An error is displayed if the specified extended regular expression is invalid.
 This option and partial matching (`--partial` or `-p`) are mutually exclusive.
 An error is displayed when used simultaneously.
 
+### `assert_regex`
+
+This function is similar to `assert_equal` but uses pattern matching instead of
+equality, by wrapping `[[ value =~ pattern ]]`.
+
+Fail if the value (first parameter) does not match the pattern (second
+parameter).
+
+```bash
+@test 'assert_regex()' {
+  assert_regex 'what' 'x$'
+}
+```
+
+On failure, the value and the pattern are displayed.
+
+```
+-- values does not match regular expression --
+value    : what
+pattern  : x$
+--
+```
+
+If the value is longer than one line then it is displayed in *multi-line*
+format.
+
+An error is displayed if the specified extended regular expression is invalid.
+
+For description of the matching behavior, refer to the documentation of the
+`=~` operator in the
+[Bash manual]: https://www.gnu.org/software/bash/manual/html_node/Conditional-Constructs.html.
+Note that the `BASH_REMATCH` array is available immediately after the
+assertion succeeds but is fragile, i.e. prone to being overwritten as a side
+effect of other actions.
+
+### `refute_regex`
+
+This function is similar to `refute_equal` but uses pattern matching instead of
+equality, by wrapping `! [[ value =~ pattern ]]`.
+
+Fail if the value (first parameter) matches the pattern (second parameter).
+
+```bash
+@test 'refute_regex()' {
+  refute_regex 'WhatsApp' 'Threema'
+}
+```
+
+On failure, the value, the pattern and the match are displayed.
+
+```
+@test 'refute_regex()' {
+  refute_regex 'WhatsApp' 'What.'
+}
+
+-- value matches regular expression --
+value    : WhatsApp
+pattern  : What.
+match    : Whats
+case     : sensitive
+--
+```
+
+If the value or pattern is longer than one line then it is displayed in
+*multi-line* format.
+
+An error is displayed if the specified extended regular expression is invalid.
+
+For description of the matching behavior, refer to the documentation of the
+`=~` operator in the
+[Bash manual]: https://www.gnu.org/software/bash/manual/html_node/Conditional-Constructs.html.
+
+Note that the `BASH_REMATCH` array is available immediately after the assertion
+fails but is fragile, i.e. prone to being overwritten as a side effect of other
+actions like calling `run`. Thus, it's good practice to avoid using
+`BASH_REMATCH` in conjunction with `refute_regex()`. The valuable information
+the array contains is the matching part of the value which is printed in the
+failing test log, as mentioned above.
+
 <!-- REFERENCES -->
 
 [bats]: https://github.com/bats-core/bats-core
 [bash-comp-cmd]: https://www.gnu.org/software/bash/manual/bash.html#Compound-Commands
-[bats-docs]: https://github.com/ztombol/bats-docs
-[bats-support-output]: https://github.com/ztombol/bats-support#output-formatting
-[bats-support]: https://github.com/ztombol/bats-support
+[bats-docs]: https://bats-core.readthedocs.io/
+[bats-support-output]: https://github.com/bats-core/bats-support#output-formatting
+[bats-support]: https://github.com/bats-core/bats-support
