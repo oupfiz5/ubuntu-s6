@@ -1,6 +1,6 @@
 # DETIK: DevOps e2e Testing in Kubernetes
-[![License](https://img.shields.io/github/license/mashape/apistatus.svg)]()
-[![Build Status](https://travis-ci.org/bats-core/bats-detik.svg?branch=master)](https://travis-ci.org/bats-core/bats-detik)
+[![License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/bats-core/bats-detik/blob/master/LICENSE)
+![Build status](https://github.com/bats-core/bats-detik/actions/workflows/test.yml/badge.svg)
 
 This repository provides utilities to **execute end-to-end tests** of applications in Kubernetes clusters. This includes performing actions on the cluster (with kubectl, oc - for OpenShift - or helm) and verifying assertions by using a natural language, or almost. This reduces the amount of advanced bash commands to master.
 
@@ -11,24 +11,31 @@ This kind of test is the ultimate set of verifications to run for a project, lon
 
 ## Table of Contents
 
-* [Objectives](#objectives)
-* [Examples](#examples)
-  * [Test files and result](#test-files-and-result)
-  * [Working with Kubectl or OC commands](#working-with-kubectl-or-oc-commands)
-  * [Other Examples](#other-examples)
-* [Usage](#usage)
-  * [Setup](#setup)
-  * [Executing tests by hand](#executing-tests-by-hand)
-  * [Continuous Integration](#continuous-integration)
-* [Syntax Reference](#syntax-reference)
-  * [Counting Resources](#counting-resources)
-  * [Verifying Property Values](#verifying-property-values)
-  * [Property Names](#property-names)
-* [Errors](#errors)
-  * [Error Codes](#error-codes)
-  * [Debugging Tests](#debugging-tests)
-  * [Linting](#linting)
-  * [Tips](#tips)
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!-- param::isNotitle::true:: -->
+
+- [Objectives](#objectives)
+- [Examples](#examples)
+  - [Test files and result](#test-files-and-result)
+  - [Working with Kubectl or OC commands](#working-with-kubectl-or-oc-commands)
+  - [Other Examples](#other-examples)
+- [Usage](#usage)
+  - [Manual Setup](#manual-setup)
+  - [Docker Setup](#docker-setup)
+  - [Continuous Integration](#continuous-integration)
+- [Syntax Reference](#syntax-reference)
+  - [Counting Resources](#counting-resources)
+  - [Verifying Property Values](#verifying-property-values)
+  - [Property Names](#property-names)
+- [Errors](#errors)
+  - [Error Codes](#error-codes)
+  - [Debugging Tests](#debugging-tests)
+  - [Linting](#linting)
+  - [Tips](#tips)
+- [Beyond K8s assertions](#beyond-k8s-assertions)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 
 ## Objectives
@@ -47,9 +54,11 @@ This kind of test is the ultimate set of verifications to run for a project, lon
 
 ### Test files and result
 
-This section shows how to write unit tests using this library and BATS.
+This section shows how to write unit tests using this library and [BATS](https://github.com/bats-core/bats-core).
 
 ```bash
+#!/usr/bin/env bats
+
 load "lib/utils"
 load "lib/detik"
 
@@ -91,19 +100,20 @@ DETIK_CLIENT_NAME="kubectl"
 }
 ```
 
-Running the command **bats my-tests.bats** would result in the following output...
+Executing **bats my-tests.bats** would result in the [following output](doc/success.gif)...
 
-```
+```ada
 bats my-tests.bats
 1..2
 ✓ 1 verify the deployment
 ✓ 2 verify the undeployment
+
 The command "bats my-tests.bats" exited with 0.
 ```
 
-In case of error, it would show...
+In case of error, [it would show](doc/failure.gif)...
 
-```
+```ada
 bats my-tests.bats
 1..2
 ✗ 1 verify the deployment
@@ -111,14 +121,15 @@ bats my-tests.bats
      `[ "$status" -eq 0 ]' failed
  
 ✓ 2 verify the undeployment
+
 The command "bats my-tests.bats" exited with 1.
 ```
 
-Since this project uses BATS, you can use **setup** and **teardown**
+Since this project works with BATS, you can use **setup** and **teardown**
 functions to prepare and clean after every test in a file.
 
 
-## Working with Kubectl or OC commands
+### Working with Kubectl or OC commands
 
 If you are working with a native Kubernetes cluster.
 
@@ -172,7 +183,7 @@ verify "there are 2 pods named 'nginx'"
 ```
 
 
-## Other Examples
+### Other Examples
 
 Examples are available under [the eponym directory](examples/ci).  
 It includes...
@@ -273,31 +284,29 @@ verify "there are <number> <resource-type> named '<regular-expression>'"
 *resource-type* is one of the K8s ones (e.g. `pods`, `po`, `services`, `svc`...).  
 See [https://kubernetes.io/docs/reference/kubectl/overview/#resource-types](https://kubernetes.io/docs/reference/kubectl/overview/#resource-types) for a complete reference.
 
-This simple assertion may fail sometimes.  
-As an example, if you count the number of PODs, run your test and then kill the POD, they will still
-be listed, with the TERMINATING state. So, most of the time, you will want to verify the number of instances
-with a given property value. Example: count the number of PODs with a given name pattern and having the `started` status.
-Hence this additional syntax.
+
+> :warning: This simple assertion may fail sometimes.
+>
+> As an example, if you count the number of PODs, run your test and then kill the POD, they will still be listed, with the `TERMINATING` state.
+>
+> So, most of the time, you will want to verify the number of instances with a given property value. Example: count the number of PODs with a given name pattern and having the `started` status.
+
+Hence this additional syntax (using [next section](#verifying-property-values) documentation to verify additionnal properties):
 
 ```bash
-# Expecting 0 or 1 instance
-try "at most <number> times every <number>s \
-	to find <0 or 1> <resource-type> named '<regular-expression>' \
-	with '<property-name>' being '<expected-value>'"
-
-# Expecting more than 1 instance
+# Expecting a given number of instances
 try "at most <number> times every <number>s \
 	to find <number> <resource-type> named '<regular-expression>' \
 	with '<property-name>' being '<expected-value>'"
 ```
 
-This is a checking loop.  
-It breaks the loop if as soon as the assertion is verified. If it reaches the end of the loop
-with having been verified, an error is thrown. Please, refer to [this section](#property-names) for details
-about the property names.
-
-This assertion is useful for PODs, whose life cycle changes take time.  
+:pushpin: This assertion is useful for PODs, whose life cycle changes take time.  
 For services, you may directly use the simple count assertions.
+
+This is a checking loop.
+It breaks the loop if as soon as the assertion is verified. If it reaches the end of the loop
+without having been verified, an error is thrown. Please, refer to [this section](#property-names) for details
+about the property names.
 
 
 ### Verifying Property Values
@@ -318,16 +327,16 @@ try "at most <number> times every <number>s \
 
 This is a checking loop.  
 It breaks the loop if as soon as the assertion is verified. If it reaches the end of the loop
-with having been verified, an error is thrown. Please, refer to [this section](#property-names) for details
+without having been verified, an error is thrown. Please, refer to [this section](#property-names) for details
 about the property names.
 
-This assertion verifies all the instances have this property value.
-But unlike the assertion type to count resources, you do not verify how many instances have this value.
+:memo: This assertion verifies _all the instances_ have this property value.
+But unlike the assertion type to [count resources](#counting-resources), you do not verify _how many instances_ have this value. Notice however that **if it finds 0 item verifying the property, the assertion fails**.
 
 
 ### Property Names
 
-In all assertions, *property-name* if one of the column names supported by K8s.  
+In all assertions, *property-name* is one of the column names supported by K8s.  
 See https://kubernetes.io/docs/reference/kubectl/overview/#custom-columns  
 You can also find column names by using `kubectl get <resource-type> -o custom-columns=ALL:*`.
 
@@ -362,7 +371,7 @@ There is a **debug** function in DETIK.
 You can use it in your own tests. Debug traces are stored into **/tmp/detik/**.
 There is one debug file per test file.
 
-It is recommended to reset this file at beginning of every test file.
+It is recommended to reset this file at the beginning of every test file.
 
 ```bash
 #!/usr/bin/env bats
@@ -445,3 +454,18 @@ load "lib/linter"
 
 1. **Do not use file descriptors 3 and 4 in your tests.**  
 They are already used by BATS. And 0, 1 and 2 are default file descriptors. Use 5, 6 and higher values.
+
+
+## Beyond K8s assertions
+
+End-to-end tests may involve much more than K8s assertions.  
+BATS and DETIK can be combined with other testing frameworks, such
+as performance tests (e.g. with [Gatling](https://gatling.io) and
+[JMeter](https://jmeter.apache.org)) or functional scenarios with user
+interactions (e.g. with [Selenium](https://www.selenium.dev),
+[Cypress](https://www.cypress.io) or [Robot Framework](https://robotframework.org/)).
+
+To do so, you would need to have these tools colocated (in a same
+VM, container or POD). Your BATS scenarios would then invoke the various
+tools and verify assertions with BATS. Sky is the limit then: it all
+depends on what you want to test.

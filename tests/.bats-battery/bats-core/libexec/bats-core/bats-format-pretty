@@ -5,6 +5,7 @@ set -e
 source "$BATS_ROOT/lib/bats-core/formatter.bash"
 
 BASE_PATH=.
+BATS_ENABLE_TIMING=
 
 while [[ "$#" -ne 0 ]]; do
   case "$1" in
@@ -39,10 +40,17 @@ update_count_column_left() {
   count_column_left=$((screen_width - count_column_width))
 }
 
-trap update_screen_width WINCH
+# avoid unset variables
+count=0
+screen_width=80
+update_count_column_width
 update_screen_width
+test_result=
+
+trap update_screen_width WINCH
 
 begin() {
+  test_result= # reset to avoid carrying over result state from previous test
   line_backoff_count=0
   go_to_column 0
   update_count_column_width
@@ -57,16 +65,22 @@ begin() {
   go_to_column 1
 }
 
-pass() {
+finish_test() {
   move_up $line_backoff_count
   go_to_column 0
-  buffer ' ✓ %s' "$name"
+  buffer "$@"
   if [[ -n "$BATS_ENABLE_TIMING" ]]; then
     set_color 2
-    buffer ' [%s]' "$1"
+    buffer ' [%s]' "$TIMING"
   fi
   advance
-  move_down $line_backoff_count
+  move_down $(( line_backoff_count - 1 ))
+}
+
+pass() {
+  TIMING="${1:-}"
+  finish_test ' ✓ %s' "$name"
+  test_result=pass
 }
 
 skip() {
@@ -74,33 +88,37 @@ skip() {
   if [[ -n "$reason" ]]; then
     reason=": $reason"
   fi
-  move_up $line_backoff_count
-  go_to_column 0
-  buffer ' - %s (skipped%s)' "$name" "$reason"
-  advance
-  move_down $line_backoff_count
+  BATS_ENABLE_TIMING='' finish_test ' - %s (skipped%s)' "$name" "$reason"
+  test_result=skip
 }
 
 fail() {
-  move_up $line_backoff_count
-  go_to_column 0
   set_color 1 bold
-  buffer ' ✗ %s' "$name"
-  if [[ -n "$BATS_ENABLE_TIMING" ]]; then
-    set_color 2
-    buffer ' [%s]' "$1"
-  fi
-  advance
-  move_down $line_backoff_count
+  TIMING="${1:-}"
+  finish_test ' ✗ %s' "$name"
+  test_result=fail
 }
 
 log() {
-  set_color 1
+  case ${test_result} in
+    pass)
+    clear_color
+    ;;
+    fail)
+    set_color 1
+    ;;
+  esac
   buffer '   %s\n' "$1"
   clear_color
 }
 
 summary() {
+  if  [ "$failures" -eq 0 ] ; then
+    set_color 2 bold
+  else
+    set_color 1 bold
+  fi
+
   buffer '\n%d test' "$count"
   if [[ "$count" -ne 1 ]]; then
     buffer 's'
@@ -125,6 +143,7 @@ summary() {
   fi
 
   buffer '\n'
+  clear_color
 }
 
 buffer_with_truncation() {
@@ -173,7 +192,7 @@ set_color() {
   local color="$1"
   local weight=22
 
-  if [[ "$2" == 'bold' ]]; then
+  if [[ "${2:-}" == 'bold' ]]; then
     weight=1
   fi
   buffer '\x1B[%d;%dm' "$((30 + color))" "$weight"
@@ -190,6 +209,13 @@ buffer() {
   # shellcheck disable=SC2059
   printf -v content -- "$@"
   _buffer+="$content"
+}
+
+prefix_buffer_with() {
+  local old_buffer="$_buffer"
+  _buffer=''
+  "$@"
+  _buffer="$_buffer$old_buffer"
 }
 
 flush() {
@@ -223,29 +249,36 @@ bats_tap_stream_begin() {
 }
 
 bats_tap_stream_ok() {
-  index="$1"
-  ((++passed))
+  local duration=
   if [[ "$1" == "--duration" ]]; then
-    pass "$2"
-  else
-    pass
+    duration="$2"
+    shift 2
   fi
+  index="$1"
+  name="$2"
+  ((++passed))
+  
+  pass "$duration"
 }
 
 bats_tap_stream_skipped() {
   index="$1"
+  name="$2"
   ((++skipped))
   skip "$3"
 }
 
 bats_tap_stream_not_ok() {
-  index="$1"
-  ((++failures))
+  local duration=
   if [[ "$1" == "--duration" ]]; then
-    fail "$2"
-  else
-    fail
+    duration="$2"
+    shift 2
   fi
+  index="$1"
+  name="$2"
+  ((++failures))
+  
+  fail "$duration"
 }
 
 bats_tap_stream_comment() { # <comment> <scope>
@@ -267,7 +300,11 @@ bats_tap_stream_suite() {
   line_backoff_count=0
   index=
   # indicate filename for failures
-  name="File $(remove_prefix "$BASE_PATH" "$1")"
+  local file_name="${1/$BASE_PATH}"
+  name="File $file_name"
+  set_color 4 bold
+  buffer "%s\n" "$file_name"
+  clear_color
 }
 
 line_backoff_count=0
