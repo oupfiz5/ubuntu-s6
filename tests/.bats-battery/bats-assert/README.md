@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/npm/l/bats-assert.svg)](https://github.com/bats-core/bats-assert/blob/master/LICENSE)
 [![GitHub release](https://img.shields.io/github/release/bats-core/bats-assert.svg)](https://github.com/bats-core/bats-assert/releases/latest)
 [![npm release](https://img.shields.io/npm/v/bats-assert.svg)](https://www.npmjs.com/package/bats-assert)
-[![Build Status](https://travis-ci.org/bats-core/bats-assert.svg?branch=master)](https://travis-ci.org/bats-core/bats-assert)
+[![Tests](https://github.com/bats-core/bats-assert/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/bats-core/bats-assert/actions/workflows/tests.yml)
 
 `bats-assert` is a helper library providing common assertions for [Bats][bats].
 
@@ -34,6 +34,7 @@ This project provides the following functions:
 
  - [assert](#assert) / [refute](#refute) Assert a given expression evaluates to `true` or `false`.
  - [assert_equal](#assert_equal) Assert two parameters are equal.
+ - [assert_not_equal](#assert_not_equal) Assert two parameters are not equal.
  - [assert_success](#assert_success) / [assert_failure](#assert_failure) Assert exit status is `0` or `1`.
  - [assert_output](#assert_output) / [refute_output](#refute_output) Assert output does (or does not) contain given content.
  - [assert_line](#assert_line) / [refute_line](#refute_line) Assert a specific line of output does (or does not) contain given content.
@@ -67,8 +68,7 @@ Fail if the given expression evaluates to false.
 
 ```bash
 @test 'assert()' {
-  touch '/var/log/test.log'
-  assert [ -e '/var/log/test.log' ]
+  assert [ 1 -lt 0 ]
 }
 ```
 
@@ -76,7 +76,7 @@ On failure, the failed expression is displayed.
 
 ```
 -- assertion failed --
-expression : [ -e /var/log/test.log ]
+expression : [ 1 -lt 0 ]
 --
 ```
 
@@ -91,8 +91,7 @@ Fail if the given expression evaluates to true.
 
 ```bash
 @test 'refute()' {
-  rm -f '/var/log/test.log'
-  refute [ -e '/var/log/test.log' ]
+  refute [ 1 -gt 0 ]
 }
 ```
 
@@ -100,7 +99,7 @@ On failure, the successful expression is displayed.
 
 ```
 -- assertion succeeded, but it was expected to fail --
-expression : [ -e /var/log/test.log ]
+expression : [ 1 -gt 0 ]
 --
 ```
 
@@ -121,6 +120,28 @@ On failure, the expected and actual values are displayed.
 -- values do not equal --
 expected : want
 actual   : have
+--
+```
+
+If either value is longer than one line both are displayed in *multi-line* format.
+
+
+### `assert_not_equal`
+
+Fail if the two parameters, actual and unexpected value respectively, are equal.
+
+```bash
+@test 'assert_not_equal()' {
+  assert_not_equal 'foobar' 'foobar'
+}
+```
+
+On failure, the expected and actual values are displayed.
+
+```
+-- values should not be equal --
+unexpected : foobar
+actual     : foobar
 --
 ```
 
@@ -676,6 +697,6 @@ An error is displayed when used simultaneously.
 
 [bats]: https://github.com/bats-core/bats-core
 [bash-comp-cmd]: https://www.gnu.org/software/bash/manual/bash.html#Compound-Commands
-[bats-docs]: https://github.com/ztombol/bats-docs
-[bats-support-output]: https://github.com/ztombol/bats-support#output-formatting
-[bats-support]: https://github.com/ztombol/bats-support
+[bats-docs]: https://bats-core.readthedocs.io/
+[bats-support-output]: https://github.com/bats-core/bats-support#output-formatting
+[bats-support]: https://github.com/bats-core/bats-support
