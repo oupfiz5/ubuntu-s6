@@ -397,6 +397,8 @@ docker exec -it ubuntu-s6 /bin/bash
 :CUSTOM_ID: dockerfile
 :END:
 #+begin_src sh :shebang ""
+  # syntax=docker/dockerfile:1.4
+
   # * Base image
   ARG UBUNTU_VERSION="${UBUNTU_VERSION}"
   FROM ubuntu:${UBUNTU_VERSION}
@@ -460,6 +462,8 @@ docker exec -it ubuntu-s6 /bin/bash
 :CUSTOM_ID: dockerfile-s6v2
 :END:
 #+begin_src sh :shebang ""
+  # syntax=docker/dockerfile:1.4
+
   # * Base image
   ARG UBUNTU_VERSION="${UBUNTU_VERSION}"
   FROM ubuntu:${UBUNTU_VERSION}

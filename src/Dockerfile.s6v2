@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.4
+
 # * Base image
 ARG UBUNTU_VERSION="${UBUNTU_VERSION}"
 FROM ubuntu:${UBUNTU_VERSION}
