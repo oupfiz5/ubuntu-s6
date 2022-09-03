@@ -30,7 +30,7 @@ bats_capture_stack_trace() {
 bats_get_failure_stack_trace() {
 	local stack_trace_var
 	# See bats_debug_trap for details.
-	if [[ -n "${BATS_DEBUG_LAST_STACK_TRACE_IS_VALID}" ]]; then
+	if [[ -n "${BATS_DEBUG_LAST_STACK_TRACE_IS_VALID:-}" ]]; then
 		stack_trace_var=BATS_DEBUG_LAST_STACK_TRACE
 	else
 		stack_trace_var=BATS_DEBUG_LASTLAST_STACK_TRACE
@@ -102,6 +102,12 @@ bats_print_failed_command() {
 	bats_quote_code quoted_failed_command "$failed_command"
 	printf '#   %s ' "${quoted_failed_command}"
 
+	if [[ "${BATS_TIMED_OUT-NOTSET}" != NOTSET ]]; then
+		# the other values can be safely overwritten here,
+		# as the timeout is the primary reason for failure
+		BATS_ERROR_SUFFIX=" due to timeout"
+	fi
+
 	if [[ "$BATS_ERROR_STATUS" -eq 1 ]]; then
 		printf 'failed%s\n' "$BATS_ERROR_SUFFIX"
 	else
@@ -170,7 +176,7 @@ bats_emit_trace() {
 		# shellcheck disable=SC2016
 		if [[ $BASH_COMMAND != '"$BATS_TEST_NAME" >> "$BATS_OUT" 2>&1 4>&1' && $BASH_COMMAND != "bats_test_begin "* ]] && # don't emit these internal calls
 			[[ $BASH_COMMAND != "$BATS_LAST_BASH_COMMAND" || $line != "$BATS_LAST_BASH_LINENO" ]] &&
-			# avoid printing a function twice (at call site and at definiton site)
+			# avoid printing a function twice (at call site and at definition site)
 			[[ $BASH_COMMAND != "$BATS_LAST_BASH_COMMAND" || ${BASH_LINENO[2]} != "$BATS_LAST_BASH_LINENO" || ${BASH_SOURCE[3]} != "$BATS_LAST_BASH_SOURCE" ]]; then
 			local file="${BASH_SOURCE[2]}" # index 2: skip over bats_emit_trace and bats_debug_trap
 			if [[ $file == "${BATS_TEST_SOURCE}" ]]; then
@@ -251,7 +257,9 @@ bats_debug_trap() {
 	
 	# don't update the trace within library functions or we get backtraces from inside traps
 	# also don't record new stack traces while handling interruptions, to avoid overriding the interrupted command
-	if [[ -z "$file_excluded" && "${BATS_INTERRUPTED-NOTSET}" == NOTSET ]]; then
+	if [[ -z "$file_excluded" && 
+			"${BATS_INTERRUPTED-NOTSET}" == NOTSET &&
+			"${BATS_TIMED_OUT-NOTSET}" == NOTSET ]]; then
 		BATS_DEBUG_LASTLAST_STACK_TRACE=(
 			${BATS_DEBUG_LAST_STACK_TRACE[@]+"${BATS_DEBUG_LAST_STACK_TRACE[@]}"}
 		)
@@ -275,7 +283,7 @@ bats_debug_trap() {
 # isn't set properly during `teardown()` errors.
 bats_check_status_from_trap() {
 	local status="$?"
-	if [[ -z "$BATS_TEST_COMPLETED" ]]; then
+	if [[ -z "${BATS_TEST_COMPLETED:-}" ]]; then
 		BATS_ERROR_STATUS="${BATS_ERROR_STATUS:-$status}"
 		if [[ "$BATS_ERROR_STATUS" -eq 0 ]]; then
 			BATS_ERROR_STATUS=1
@@ -299,6 +307,26 @@ bats_add_debug_exclude_path() { # <path>
 }
 
 bats_setup_tracing() {
+	# Variables for capturing accurate stack traces. See bats_debug_trap for
+	# details.
+	#
+	# BATS_DEBUG_LAST_LINENO, BATS_DEBUG_LAST_SOURCE, and
+	# BATS_DEBUG_LAST_STACK_TRACE hold data from the most recent call to
+	# bats_debug_trap.
+	#
+	# BATS_DEBUG_LASTLAST_STACK_TRACE holds data from two bats_debug_trap calls
+	# ago.
+	#
+	# BATS_DEBUG_LAST_STACK_TRACE_IS_VALID indicates that
+	# BATS_DEBUG_LAST_STACK_TRACE contains the stack trace of the test's error. If
+	# unset, BATS_DEBUG_LAST_STACK_TRACE is unreliable and
+	# BATS_DEBUG_LASTLAST_STACK_TRACE should be used instead.
+	BATS_DEBUG_LASTLAST_STACK_TRACE=()
+	BATS_DEBUG_LAST_LINENO=()
+	BATS_DEBUG_LAST_SOURCE=()
+	BATS_DEBUG_LAST_STACK_TRACE=()
+	BATS_DEBUG_LAST_STACK_TRACE_IS_VALID=
+	BATS_ERROR_SUFFIX=
 	BATS_DEBUG_EXCLUDE_PATHS=()
 	# exclude some paths by default
 	bats_add_debug_exclude_path "$BATS_ROOT/lib/"
@@ -327,7 +355,7 @@ bats_setup_tracing() {
 		fi
 	done
 
-	# turn on traps after setting excludedes to avoid tracing the exclude setup
+	# turn on traps after setting excludes to avoid tracing the exclude setup
 	trap 'bats_debug_trap "$BASH_SOURCE"' DEBUG
   	trap 'bats_error_trap' ERR
 }
@@ -352,7 +380,7 @@ bats_interrupt_trap() {
   BATS_INTERRUPTED=true
   BATS_ERROR_STATUS=130
   # debug trap fires before interrupt trap but gets wrong linenumber (line 1)
-  # -> use last last stack trace
+  # -> use last stack trace
   exit $BATS_ERROR_STATUS
 }
 

@@ -14,6 +14,15 @@ The format is based on [Keep a Changelog][kac] and this project adheres to
 
 * using external formatters via `--formatter <absolute path>` (also works for
   `--report-formatter`) (#602)
+* running only tests that failed in the last run via `--filter-status failed` (#483)
+* variable `BATS_TEST_RETRIES` that specifies how often a test should be
+  reattempted before it is considered failed (#618)
+* Docker tags `latest-no-faccessat2` and `<bats-version\>-no-faccessat2` for
+  avoiding `bash: bats: No such file or directory` on `docker<20.10` (or
+  `runc<v1.0.0-rc93`) (#622)
+* `BATS_TEST_TIMEOUT` variable to force a timeout on test (including `setup()`) (#491)
+* also print (nonempty) `$stderr` (from `run --separate-stderr`) with
+  `--print-output-on-failure` (#631)
 
 #### Documentation
 
@@ -27,13 +36,24 @@ The format is based on [Keep a Changelog][kac] and this project adheres to
 * remaining instances of `run -<N>` being incorrectly documented as `run =<N>` (#599)
 * allow `--gather-test-outputs-in <directory>` to work with existing, empty
   directories (#603)
-  * also add `--clean-and-gather-test-outpust-in <directory>` for improved UX
+  * also add `--clean-and-gather-test-outputs-in <directory>` for improved UX
 * double slashes in paths derived from TMPDIR on MacOS (#607)
 * fix `load` in `teardown` marking failed tests as not run (#612)
+* fix unset variable errors (with set -u) and add regression test (#621)
+* `teardown_file` errors don't swallow `setup_file` errors anymore, the behavior
+  is more like `teardown`'s now (only `return`/last command can trigger `teardown`
+   errors) (#623)
+* upgraded from deprecated CI envs for MacOS (10 -> 11,12) and Ubuntu
+  (18.04 -> 22.04) (#630)
+* add `/usr/lib/bats` as default value for `BATS_LIB_PATH` (#628)
+* fix unset variable in `bats-formatter-junit` when `setup_file` fails (#632)
+* unify error behavior of `teardown`/`teardown_file`/`teardown_suite` functions:
+  only fail via return code, not via ERREXIT (#633)
 
 #### Documentation
 
-* fix typos and links (#596, #604)
+* fix typos, spelling and links (#596, #604, #619, #627)
+* fix redirection order of an example in the tutorial (#617)
 
 ## [1.7.0] - 2022-05-14
 
@@ -209,7 +229,7 @@ quotes around code blocks in error output (#506)
 * custom test-file extension via `BATS_FILE_EXTENSION` when searching for test
   files in a directory (#376)
 * TAP13 formatter, including millisecond timing (#337)
-* automatic release to NPM via Github Actions (#406)
+* automatic release to NPM via GitHub Actions (#406)
 
 #### Documentation
 
@@ -225,7 +245,7 @@ quotes around code blocks in error output (#506)
     `--report-formatter junit` to obtain the `.xml` report file!
 * removed `--parallel-preserve-environment` flag, as this is the default
   behavior (#324)
-* moved CI from Travis/Appveyor to Github Actions (#405)
+* moved CI from Travis/AppVeyor to GitHub Actions (#405)
 * preprocessed files are no longer removed if `--no-tempdir-cleanup` is
   specified (#395)
 
@@ -411,7 +431,16 @@ Changes:
 
 * Initial public release.
 
-[Unreleased]: https://github.com/bats-core/bats-core/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/bats-core/bats-core/compare/v1.7.0...HEAD
+[1.7.0]: https://github.com/bats-core/bats-core/compare/v1.6.1...v1.7.0
+[1.6.1]: https://github.com/bats-core/bats-core/compare/v1.6.0...v1.6.1
+[1.6.0]: https://github.com/bats-core/bats-core/compare/v1.5.0...v1.6.0
+[1.5.0]: https://github.com/bats-core/bats-core/compare/v1.4.1...v1.5.0
+[1.4.1]: https://github.com/bats-core/bats-core/compare/v1.4.0...v1.4.1
+[1.4.0]: https://github.com/bats-core/bats-core/compare/v1.3.0...v1.4.0
+[1.3.0]: https://github.com/bats-core/bats-core/compare/v1.2.1...v1.3.0
+[1.2.1]: https://github.com/bats-core/bats-core/compare/v1.2.0...v1.2.1
+[1.2.0]: https://github.com/bats-core/bats-core/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/bats-core/bats-core/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/bats-core/bats-core/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/bats-core/bats-core/compare/v1.0.0...v1.0.1
