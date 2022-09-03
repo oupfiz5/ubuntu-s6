@@ -64,7 +64,7 @@ setup() {
     # the replay should be possible without errors
     bash -u "$formatter" >/dev/null <<EOF
 1..1
-suite "$BATS_FIXTURE_ROOT/failing.bats"
+suite "$FIXTURE_ROOT/failing.bats"
 # output from setup_file
 begin 1 test_a_failing_test
 # fd3 output from test
@@ -86,7 +86,7 @@ EOF
     [ "$output" = "Dummy Formatter!" ]
 }
 
-@test "specifying non existing external formatter is an error" {
+@test "specifying nonexistent external formatter is an error" {
   bats_require_minimum_version 1.5.0
   run -1 bats "$FIXTURE_ROOT/passing.bats"  --formatter "$FIXTURE_ROOT/non-existing-file"
   [ "$output" = "ERROR: Formatter '$FIXTURE_ROOT/non-existing-file' is not readable!" ]

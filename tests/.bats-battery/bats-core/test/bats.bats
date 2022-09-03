@@ -326,8 +326,8 @@ setup() {
 @test 'ensure compatibility with unofficial Bash strict mode' {
   local expected='ok 1 unofficial Bash strict mode conditions met'
 
-  if [[ -n "$BATS_NUMBER_OF_PARALLEL_JOBS" ]]; then
-    if [[ -z "$BATS_NO_PARALLELIZE_ACROSS_FILES" ]]; then
+  if [[ -n "${BATS_NUMBER_OF_PARALLEL_JOBS:-}" ]]; then
+    if [[ -z "${BATS_NO_PARALLELIZE_ACROSS_FILES:-}" ]]; then
       type -p parallel &>/dev/null || skip "Don't check file parallelized without GNU parallel"
     fi
     (type -p flock &>/dev/null || type -p shlock &>/dev/null) || skip "Don't check parallelized without flock/shlock "
@@ -340,8 +340,8 @@ setup() {
   run env - \
           "PATH=$PATH" \
           "HOME=$HOME" \
-          "BATS_NO_PARALLELIZE_ACROSS_FILES=$BATS_NO_PARALLELIZE_ACROSS_FILES" \
-          "BATS_NUMBER_OF_PARALLEL_JOBS=$BATS_NUMBER_OF_PARALLEL_JOBS" \
+          "BATS_NO_PARALLELIZE_ACROSS_FILES=${BATS_NO_PARALLELIZE_ACROSS_FILES:-}" \
+          "BATS_NUMBER_OF_PARALLEL_JOBS=${BATS_NUMBER_OF_PARALLEL_JOBS:-}" \
           SHELLOPTS=nounset \
       "${BATS_ROOT}/bin/bats" "$FIXTURE_ROOT/unofficial_bash_strict_mode.bats"
   if [[ "$status" -ne 0 || "${lines[1]}" != "$expected" ]]; then
@@ -602,7 +602,7 @@ END_OF_ERR_MSG
 }
 
 @test "Don't hang on CTRL-C (issue #353)" {
-  if [[ "$BATS_NUMBER_OF_PARALLEL_JOBS" -gt 1 ]]; then
+  if [[ "${BATS_NUMBER_OF_PARALLEL_JOBS:-1}" -gt 1 ]]; then
     skip "Aborts don't work in parallel mode"
   fi
   load 'concurrent-coordination'
@@ -731,7 +731,7 @@ END_OF_ERR_MSG
 }
 
 @test "CTRL-C aborts and fails the current test" {
-  if [[ "$BATS_NUMBER_OF_PARALLEL_JOBS" -gt 1 ]]; then
+  if [[ "${BATS_NUMBER_OF_PARALLEL_JOBS:-1}" -gt 1 ]]; then
     skip "Aborts don't work in parallel mode"
   fi
   
@@ -767,7 +767,10 @@ END_OF_ERR_MSG
 }
 
 @test "CTRL-C aborts and fails the current run" {
-  if [[ "$BATS_NUMBER_OF_PARALLEL_JOBS" -gt 1 ]]; then
+  # shellcheck disable=SC2034
+  BATS_TEST_RETRIES=2
+  
+  if [[ "${BATS_NUMBER_OF_PARALLEL_JOBS:-1}" -gt 1 ]]; then
     skip "Aborts don't work in parallel mode"
   fi
 
@@ -802,7 +805,9 @@ END_OF_ERR_MSG
 }
 
 @test "CTRL-C aborts and fails after run" {
-  if [[ "$BATS_NUMBER_OF_PARALLEL_JOBS" -gt 1 ]]; then
+  # shellcheck disable=SC2034
+  BATS_TEST_RETRIES=2
+  if [[ "${BATS_NUMBER_OF_PARALLEL_JOBS:-1}" -gt 1 ]]; then
     skip "Aborts don't work in parallel mode"
   fi
 
@@ -837,7 +842,7 @@ END_OF_ERR_MSG
 }
 
 @test "CTRL-C aborts and fails the current teardown" {
-  if [[ "$BATS_NUMBER_OF_PARALLEL_JOBS" -gt 1 ]]; then
+  if [[ "${BATS_NUMBER_OF_PARALLEL_JOBS:-1}" -gt 1 ]]; then
     skip "Aborts don't work in parallel mode"
   fi
 
@@ -873,7 +878,7 @@ END_OF_ERR_MSG
 }
 
 @test "CTRL-C aborts and fails the current setup_file" {
-  if [[ "$BATS_NUMBER_OF_PARALLEL_JOBS" -gt 1 ]]; then
+  if [[ "${BATS_NUMBER_OF_PARALLEL_JOBS:-1}" -gt 1 ]]; then
     skip "Aborts don't work in parallel mode"
   fi
 
@@ -909,7 +914,7 @@ END_OF_ERR_MSG
 }
 
 @test "CTRL-C aborts and fails the current teardown_file" {
-  if [[ "$BATS_NUMBER_OF_PARALLEL_JOBS" -gt 1 ]]; then
+  if [[ "${BATS_NUMBER_OF_PARALLEL_JOBS:-1}" -gt 1 ]]; then
     skip "Aborts don't work in parallel mode"
   fi
   # shellcheck disable=SC2031
@@ -1000,6 +1005,24 @@ END_OF_ERR_MSG
   [ "${lines[8]}" == "# (in test file $RELATIVE_FIXTURE_ROOT/print_output_on_failure.bats, line 10)" ]
   [ "${lines[9]}" == "#   \`false' failed" ]
   [ ${#lines[@]} -eq 10 ]
+}
+
+@test "--print-output-on-failure also shows stderr (for run --separate-stderr)" {
+  run bats --print-output-on-failure --show-output-of-passing-tests "$FIXTURE_ROOT/print_output_on_failure_with_stderr.bats"
+  [ "${lines[0]}" == '1..3' ]
+  [ "${lines[1]}" == 'ok 1 no failure prints no output' ]
+  # ^ no output despite --show-output-of-passing-tests, because there is no failure
+  [ "${lines[2]}" == 'not ok 2 failure prints output' ]
+  [ "${lines[3]}" == "# (in test file $RELATIVE_FIXTURE_ROOT/print_output_on_failure_with_stderr.bats, line 7)" ]
+  [ "${lines[4]}" == "#   \`run -1 --separate-stderr bash -c 'echo \"fail hard\"; echo with stderr >&2'' failed, expected exit code 1, got 0" ]
+  [ "${lines[5]}" == '# Last output:' ]
+  [ "${lines[6]}" == '# fail hard' ]
+  [ "${lines[7]}" == '# Last stderr:' ]
+  [ "${lines[8]}" == '# with stderr' ]
+  [ "${lines[9]}" == 'not ok 3 empty output on failure' ]
+  [ "${lines[10]}" == "# (in test file $RELATIVE_FIXTURE_ROOT/print_output_on_failure_with_stderr.bats, line 11)" ]
+  [ "${lines[11]}" == "#   \`false' failed" ]
+  [ ${#lines[@]} -eq 12 ]
 }
 
 @test "--show-output-of-passing-tests works as expected" {
@@ -1139,7 +1162,7 @@ END_OF_ERR_MSG
   [ "${lines[0]}" == 'ERROR: Unknown BATS_CODE_QUOTE_STYLE: three' ]
 }
 
-@test "Debug trap must only override variables that are prefixed with bats_ (issue #519)" {
+@test "Debug trap must only override variables that are prefixed with BATS_ (issue #519)" {
   # use declare -p to gather variables in pristine bash and bats @test environment
   # then compare which ones are introduced in @test compared to bash
 
@@ -1178,7 +1201,7 @@ END_OF_ERR_MSG
   bats_require_minimum_version 1.5.0
   # now capture bats @test environment
   run -0 env -i PATH="$PATH" BATS_DECLARED_VARIABLES_FILE="$BATS_DECLARED_VARIABLES_FILE"  bash "${BATS_ROOT}/bin/bats" "${FIXTURE_ROOT}/issue-519.bats"
-  # use function to allow failing via !, run is a bit unwiedly with the pipe and subshells
+  # use function to allow failing via !, run is a bit unwieldy with the pipe and subshells
   check_no_new_variables() {
     # -23 -> only look at additions on the bats list
     ! comm -23 <(normalize_variable_list <"$BATS_DECLARED_VARIABLES_FILE") \
@@ -1232,4 +1255,184 @@ END_OF_ERR_MSG
 
 @test "BATS_* variables don't contain double slashes" {
   TMPDIR=/tmp/ bats "$FIXTURE_ROOT/BATS_variables_dont_contain_double_slashes.bats"
+}
+
+@test "Without .bats/run-logs --filter-status failed returns an error" {
+  bats_require_minimum_version 1.5.0
+  run -1 bats --filter-status failed "$FIXTURE_ROOT/passing_and_failing.bats"
+  [[ "${lines[0]}" == "Error: --filter-status needs '"*".bats/run-logs/' to save failed tests. Please create this folder, add it to .gitignore and try again." ]] || false
+}
+
+@test "Without previous recording --filter-status failed runs all tests and then runs only failed and missed tests" {
+  cd "$BATS_TEST_TMPDIR" # don't pollute the source folder
+  cp "$FIXTURE_ROOT/many_passing_and_one_failing.bats" .
+  mkdir -p .bats/run-logs
+  bats_require_minimum_version 1.5.0
+  run -1 bats --filter-status failed "many_passing_and_one_failing.bats"
+  # without previous recording, all tests should be run
+  [ "${lines[0]}" == 'No recording of previous runs found. Running all tests!' ]
+  [ "${lines[1]}" == '1..4' ]
+  [ "$(grep -c 'not ok' <<< "$output")" -eq 1 ]
+
+  run -1 bats --tap --filter-status failed "many_passing_and_one_failing.bats"
+  # now we should only run the failing test
+  [ "${lines[0]}" == 1..1 ]
+  [ "${lines[1]}" == "not ok 1 a failing test" ]
+
+  # add a new test that was missed before
+  echo $'@test missed { :; }' >> "many_passing_and_one_failing.bats"
+
+  find .bats/run-logs/ -type f -print -exec cat {} \;
+
+  run -1 bats --tap --filter-status failed "many_passing_and_one_failing.bats"
+  # now we should only run the failing test
+  [ "${lines[0]}" == 1..2 ]
+  [ "${lines[1]}" == "not ok 1 a failing test" ]
+  [ "${lines[4]}" == "ok 2 missed" ]
+}
+
+@test "Without previous recording --filter-status passed runs all tests and then runs only passed and missed tests" {
+  cd "$BATS_TEST_TMPDIR" # don't pollute the source folder
+  cp "$FIXTURE_ROOT/many_passing_and_one_failing.bats" .
+  mkdir -p .bats/run-logs
+  bats_require_minimum_version 1.5.0
+  run -1 bats --filter-status passed "many_passing_and_one_failing.bats"
+  # without previous recording, all tests should be run
+  [ "${lines[0]}" == 'No recording of previous runs found. Running all tests!' ]
+  [ "${lines[1]}" == '1..4' ]
+  [ "$(grep -c 'not ok' <<< "$output")" -eq 1 ]
+
+  run -0 bats --tap --filter-status passed "many_passing_and_one_failing.bats"
+  # now we should only run the passed tests
+  [ "${lines[0]}" == 1..3 ]
+  [ "$(grep -c 'not ok' <<< "$output")" -eq 0 ]
+
+  # add a new test that was missed before
+  echo $'@test missed { :; }' >> "many_passing_and_one_failing.bats"
+
+  run -0 bats --tap --filter-status passed "many_passing_and_one_failing.bats"
+  # now we should only run the passed and missed tests
+  [ "${lines[0]}" == 1..4 ]
+  [ "$(grep -c 'not ok' <<< "$output")" -eq 0 ]
+  [ "${lines[4]}" == "ok 4 missed" ]
+}
+
+@test "Without previous recording --filter-status missed runs all tests and then runs only missed tests" {
+  cd "$BATS_TEST_TMPDIR" # don't pollute the source folder
+  cp "$FIXTURE_ROOT/many_passing_and_one_failing.bats" .
+  mkdir -p .bats/run-logs
+  bats_require_minimum_version 1.5.0
+  run -1 bats --filter-status missed "many_passing_and_one_failing.bats"
+  # without previous recording, all tests should be run
+  [ "${lines[0]}" == 'No recording of previous runs found. Running all tests!' ]
+  [ "${lines[1]}" == '1..4' ]
+  [ "$(grep -c -E '^ok' <<< "$output")" -eq 3 ]
+
+  # add a new test that was missed before
+  echo $'@test missed { :; }' >> "many_passing_and_one_failing.bats"
+
+  run -0 bats --tap --filter-status missed "many_passing_and_one_failing.bats"
+  # now we should only run the missed test
+  [ "${lines[0]}" == 1..1 ]
+  [ "${lines[1]}" == "ok 1 missed" ]
+}
+
+
+
+@test "--filter-status failed gives warning on empty failed test list" {
+  cd "$BATS_TEST_TMPDIR" # don't pollute the source folder
+  cp "$FIXTURE_ROOT/passing.bats" .
+  mkdir -p .bats/run-logs
+  bats_require_minimum_version 1.5.0
+  # have no failing tests
+  run -0 bats --filter-status failed "passing.bats"
+  # try to run the empty list of failing tests
+  run -0 bats --filter-status failed "passing.bats"
+  [ "${lines[0]}" == "There where no failed tests in the last recorded run." ]
+  [ "${lines[1]}" == "1..0" ]
+  [ "${#lines[@]}" -eq 2 ]
+}
+
+enforce_own_process_group() {
+    set -m
+    "$@"
+  }
+
+@test "--filter-status failed does not update list when run is aborted" {
+  if [[ "${BATS_NUMBER_OF_PARALLEL_JOBS:-1}" -gt 1 ]]; then
+    skip "Aborts don't work in parallel mode"
+  fi
+
+  cd "$BATS_TEST_TMPDIR" # don't pollute the source folder
+  cp "$FIXTURE_ROOT/sigint_in_failing_test.bats" .
+  mkdir -p .bats/run-logs
+
+  bats_require_minimum_version 1.5.0
+  # don't hang yet, so we get a useful rerun file
+  run -1 env DONT_ABORT=1 bats "sigint_in_failing_test.bats"
+
+  # check that we have exactly one log
+  run find .bats/run-logs -name '*.log'
+  [[ "${lines[0]}" == *.log ]] || false
+  [ ${#lines[@]} -eq 1 ]
+
+  local first_run_logs="$output"
+
+  sleep 1 # ensure we would get different timestamps for each run
+
+  # now rerun but abort midrun
+  run -1 enforce_own_process_group bats --rerun-failed "sigint_in_failing_test.bats"
+
+  # should not have produced a new log
+  run find .bats/run-logs -name '*.log'
+  [ "$first_run_logs" == "$output" ]
+}
+
+@test "BATS_TEST_RETRIES allows for retrying tests" {
+  export LOG="$BATS_TEST_TMPDIR/call.log"
+  bats_require_minimum_version 1.5.0
+  run ! bats "$FIXTURE_ROOT/retry.bats"
+  [ "${lines[0]}" == '1..3' ]
+  [ "${lines[1]}" == 'not ok 1 Fail all' ]
+  [ "${lines[4]}" == 'ok 2 Fail once' ]
+  [ "${lines[5]}" == 'not ok 3 Override retries' ]
+
+  run cat "$LOG"
+  [ "${lines[0]}" == ' setup_file ' ] # should only be executed once
+  [ "${lines[22]}" == ' teardown_file ' ] # should only be executed once
+  [ "${#lines[@]}" -eq 23 ]
+
+  # 3x Fail All (give up after 3 tries/2 retries)
+  run grep test_Fail_all < "$LOG"
+  [ "${lines[0]}" == 'test_Fail_all setup 1' ] # should be executed for each try
+  [ "${lines[1]}" == 'test_Fail_all test_Fail_all 1' ]
+  [ "${lines[2]}" == 'test_Fail_all teardown 1' ] # should be executed for each try
+  [ "${lines[3]}" == 'test_Fail_all setup 2' ]
+  [ "${lines[4]}" == 'test_Fail_all test_Fail_all 2' ]
+  [ "${lines[5]}" == 'test_Fail_all teardown 2' ]
+  [ "${lines[6]}" == 'test_Fail_all setup 3' ]
+  [ "${lines[7]}" == 'test_Fail_all test_Fail_all 3' ]
+  [ "${lines[8]}" == 'test_Fail_all teardown 3' ]
+  [ "${#lines[@]}" -eq 9 ]
+
+  # 2x Fail once (pass second try/first retry)
+  run grep test_Fail_once < "$LOG"
+  [ "${lines[0]}" == 'test_Fail_once setup 1' ]
+  [ "${lines[1]}" == 'test_Fail_once test_Fail_once 1' ]
+  [ "${lines[2]}" == 'test_Fail_once teardown 1' ]
+  [ "${lines[3]}" == 'test_Fail_once setup 2' ]
+  [ "${lines[4]}" == 'test_Fail_once test_Fail_once 2' ]
+  [ "${lines[5]}" == 'test_Fail_once teardown 2' ]
+  [ "${#lines[@]}" -eq 6 ]
+
+  # 2x Override retries (give up after second try/first retry)
+  run grep test_Override_retries < "$LOG"
+  [ "${lines[0]}" == 'test_Override_retries setup 1' ]
+  [ "${lines[1]}" == 'test_Override_retries test_Override_retries 1' ]
+  [ "${lines[2]}" == 'test_Override_retries teardown 1' ]
+  [ "${lines[3]}" == 'test_Override_retries setup 2' ]
+  [ "${lines[4]}" == 'test_Override_retries test_Override_retries 2' ]
+  [ "${lines[5]}" == 'test_Override_retries teardown 2' ]
+  [ "${#lines[@]}" -eq 6 ]
+
 }

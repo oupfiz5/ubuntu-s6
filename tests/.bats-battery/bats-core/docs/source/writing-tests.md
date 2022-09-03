@@ -183,7 +183,7 @@ Apart from the changed lookup rules, `bats_load_library` behaves like `load`.
 __Note:__ As seen above `load.bash` is the entry point for libraries and
 meant to load more files from its directory or other libraries.
 
-__Note:__ Obviously, the actual `BATS_LIB_PATH` is highly dependant on the environment.
+__Note:__ Obviously, the actual `BATS_LIB_PATH` is highly dependent on the environment.
 To maintain a uniform location across systems, (distribution) package maintainers
 are encouraged to use `/usr/lib/bats/` as the install path for libraries where possible.
 However, if the package manager has another preferred location, like `npm` or `brew`,
@@ -245,7 +245,7 @@ after) all tests of the test run.
 <details>
   <summary>Example of setup/{,_file,_suite} (and teardown{,_file,_suite}) call order</summary>
 For example the following call order would result from two files (file 1 with
-tests 1 and 2, and file 2 with test3) with a corresponding `setup_suite.bash` file beeing tested:
+tests 1 and 2, and file 2 with test3) with a corresponding `setup_suite.bash` file being tested:
 
 ```text
 setup_suite # from setup_suite.bash
@@ -268,13 +268,49 @@ teardown_suite # from setup_suite.bash
 </details>
 <!-- markdownlint-enable MD033 -->
 
+Note that the `teardown*` functions can fail a test, if their return code is nonzero.
+This means, using `return 1` or having the last command in teardown fail, will
+fail the teardown. Unlike `@test`, failing commands within `teardown` won't
+trigger failure as ERREXIT is disabled.
+
+<!-- markdownlint-disable MD033 -->
+<details>
+  <summary>Example of different teardown failure modes</summary>
+
+```bash
+teardown() {
+  false # this will fail the test, as it determines the return code
+}
+
+teardown() {
+  false # this won't fail the test ...
+  echo some more code # ... and this will be executed too!
+}
+
+teardown() {
+  return 1 # this will fail the test, but the rest won't be executed
+  echo some more code
+}
+
+teardown() {
+  if true; then
+    false # this will also fail the test, as it is the last command in this function
+  else
+    true
+  fi
+}
+```
+
+</details>
+<!-- markdownlint-enable MD033 -->
+
 ## `bats_require_minimum_version <Bats version number>`
 
 Added in [v1.7.0](https://github.com/bats-core/bats-core/releases/tag/v1.7.0)
 
 Code for newer versions of Bats can be incompatible with older versions.
 In the best case this will lead to an error message and a failed test suite.
-In the worst case, the tests will pass erronously, potentially masking a failure.
+In the worst case, the tests will pass erroneously, potentially masking a failure.
 
 Use `bats_require_minimum_version <Bats version number>` to avoid this.
 It communicates in a concise manner, that you intend the following code to be run
@@ -376,6 +412,13 @@ There are several global variables you can use to introspect on Bats tests:
 - `BATS_TEST_NAME_PREFIX` will be prepended to the description of each test on 
    stdout and in reports.
 - `$BATS_TEST_DESCRIPTION` is the description of the current test case.
+- `BATS_TEST_RETRIES` is the maximum number of additional attempts that will be
+  made on a failed test before it is finally considered failed.
+  The default of 0 means the test must pass on the first attempt.
+- `BATS_TEST_TIMEOUT` is the number of seconds after which a test (including setup)
+  will be aborted and marked as failed. Updates to this value in `setup()` or `@test`
+  cannot change the running timeout countdown, so the latest useful update location
+  is `setup_file()`.
 - `$BATS_TEST_NUMBER` is the (1-based) index of the current test case in the test file.
 - `$BATS_SUITE_TEST_NUMBER` is the (1-based) index of the current test case in the test suite (over all files).
 - `$BATS_TMPDIR` is the base temporary directory used by bats to create its

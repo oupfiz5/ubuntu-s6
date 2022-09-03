@@ -8,7 +8,7 @@ setup() {
 }
 
 @test "find_in_bats_lib_path recognizes files relative to test file" {
-  test_dir="$BATS_TEST_TMPDIR/find_in_bats_lib_path/bats_test_dirname_priorty"
+  test_dir="$BATS_TEST_TMPDIR/find_in_bats_lib_path/bats_test_dirname_priority"
   mkdir -p "$test_dir"
   cp "$FIXTURE_ROOT/test_helper.bash" "$test_dir/"
   cp "$FIXTURE_ROOT/find_library_helper.bats" "$test_dir"
@@ -17,7 +17,7 @@ setup() {
 }
 
 @test "find_in_bats_lib_path recognizes files in BATS_LIB_PATH" {
-  test_dir="$BATS_TEST_TMPDIR/find_in_bats_lib_path/bats_test_dirname_priorty"
+  test_dir="$BATS_TEST_TMPDIR/find_in_bats_lib_path/bats_test_dirname_priority"
   mkdir -p "$test_dir"
   cp "$FIXTURE_ROOT/test_helper.bash" "$test_dir/"
 
@@ -130,12 +130,6 @@ setup() {
   # shellcheck disable=SC2030,SC2031
   export PATH="${path_dir}:$PATH"  HELPER_NAME="on_path"
   run -0 bats "$FIXTURE_ROOT/load.bats"
-}
-
-@test "bats_load_library requires BATS_LIB_PATH to be set" {
-  unset BATS_LIB_PATH
-  run ! bats "$FIXTURE_ROOT/bats_load_library.bats"
-  [ "${lines[4]}" == '# bats_load_library: requires BATS_LIB_PATH to be set!' ]
 }
 
 @test "bats_load_library supports libraries with loaders on the BATS_LIB_PATH" {
