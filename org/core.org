@@ -15,7 +15,7 @@ The setupfile contain global common property configuration:
 :CUSTOM_ID: about
 :END:
 
-This is [[https://hub.docker.com/_/ubuntu][ubuntu base docker image]] (version 20.04) using [[https://github.com/just-containers/s6-overlay][s6-overlay]].
+This is [[https://hub.docker.com/_/ubuntu][ubuntu base docker image]] (version 22.04) using [[https://github.com/just-containers/s6-overlay][s6-overlay]].
 
 Ubuntu-s6 is self-hosting at https://chiselapp.com/user/oupfiz5/repository/ubuntu-s6.
 
@@ -40,6 +40,7 @@ If you are reading this on GitHub, then you are looking at a Git mirror of the s
 - [[#troubleshooting][Troubleshooting]]
   - [[#log-output][Log output]]
   - [[#shell-access][Shell access]]
+- [[#changelogmd][../CHANGELOG.md]]
 
 * Prerequisite
 :PROPERTIES:
@@ -73,7 +74,7 @@ They are using for testing and scanning:
 :CUSTOM_ID: download-from-dockerhub
 :END:
 #+begin_example
-docker pull oupfiz5/ubuntu-s6:20.04-3.1.0.0
+docker pull oupfiz5/ubuntu-s6:22.04-3.1.4.2
 #+end_example
 
 ** Build from chiselapp (fossil)
@@ -116,14 +117,13 @@ docker build -t oupfiz5/ubuntu-s6 .
 :PROPERTIES:
 :CUSTOM_ID: timezone
 :END:
-Set the timezone for the container, defaults to UTC. To set the
-timezone set the desired timezone with the variable TZ.
+Set the timezone for the container, defaults to UTC. To set the timezone set the desired timezone with the variable TZ.
 
 #+begin_example
 docker run -itd --restart always \
            --name ubuntu-s6  \
            --env 'TZ=Europe/Moscow' \
-           oupfiz5/ubuntu-s6:20.04-3.1.0.0
+           oupfiz5/ubuntu-s6:22.04-3.1.4.2
 #+end_example
 
 * Continues Integration
@@ -144,7 +144,7 @@ For debugging and maintenance purposes you may want access the output log. If yo
 #+begin_example
 docker run -it --rm \
        --name=ubuntu-s6 \
-       oupfiz5/ubuntu-s6:20.04-3.1.0.0
+       oupfiz5/ubuntu-s6:22.04-3.1.4.2
 #+end_example
 
 ** Shell access
@@ -155,6 +155,22 @@ docker run -it --rm \
 #+begin_example
 docker exec -it ubuntu-s6 /bin/bash
 #+end_example
+* ../CHANGELOG.md
+#+begin_src md :tangle ../CHANGELOG.md
+# Changelog
+## 22.04-3.1.4.2 - 2023-05-03
+
+### Added
+- image tag `latest` for docker image
+
+### Changed
+- s6-overlay migrate to version ([v3.1.4.2](https://github.com/just-containers/s6-overlay/releases))
+- `hook/push.sh` push docker image with tag `latest`
+
+### Removed
+- Dockerfile for s6-overlay version 2.x
+- GitHub pipeline for s6-overlay version 2.x
+#+end_src
 * Code :code:noexport:
 :PROPERTIES:
 :CUSTOM_ID: code
@@ -164,20 +180,20 @@ docker exec -it ubuntu-s6 /bin/bash
 :CUSTOM_ID: versions
 :END:
 #+begin_src sh :shebang ""
-  CONTAINER_NAME="${CONTAINER_NAME:-ubuntu-s6}"
-  S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION:-3.1.2.1}"
-  S6_OVERLAY_IMAGE_TAG="${S6_OVERLAY_IMAGE_TAG:-3.1.2.1}"
-  UBUNTU_VERSION="${UBUNTU_VERSION:-22.04}"
-  IMAGE_NAME="${IMAGE_NAME:-ubuntu-s6}"
-  IMAGE_REPOSITORY="${IMAGE_REPOSITORY:-oupfiz5}"
-  IMAGE_TAG="${UBUNTU_VERSION}-${S6_OVERLAY_IMAGE_TAG}"
+CONTAINER_NAME="${CONTAINER_NAME:-ubuntu-s6}"
+S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION:-3.1.4.2}"
+S6_OVERLAY_IMAGE_TAG="${S6_OVERLAY_IMAGE_TAG:-3.1.4.2}"
+UBUNTU_VERSION="${UBUNTU_VERSION:-22.04}"
+IMAGE_NAME="${IMAGE_NAME:-ubuntu-s6}"
+IMAGE_REPOSITORY="${IMAGE_REPOSITORY:-oupfiz5}"
+IMAGE_TAG="${UBUNTU_VERSION}-${S6_OVERLAY_IMAGE_TAG}"
 #+end_src
 ** ../.fossil-settings/crlf-glob
 :PROPERTIES:
 :CUSTOM_ID: ----fossil-settings-crlf-glob
 :END:
 #+begin_src sh :shebang ""
-  *
+*
 #+end_src
 
 ** ../.fossil-settings/crlf-glob.no-warn
@@ -185,89 +201,80 @@ docker exec -it ubuntu-s6 /bin/bash
 :CUSTOM_ID: ----fossil-settings-crlf-glob-no-warn
 :END:
 #+begin_src sh :shebang ""
-  *
+*
 #+end_src
 ** ../.fossil-settings/ignore-glob
 :PROPERTIES:
 :CUSTOM_ID: ----fossil-settings-ignore-glob
 :END:
 #+begin_src sh :shebang ""
-  .git/
-  .github-mirroring/*
-  docs/
-  org/.configuration/*
-  tests/.bats-battery/*/.git
-  tests/.bats-battery/*/.github
+.git/
+.github-mirroring/*
+docs/
+org/.configuration/*
+tests/.bats-battery/*/.git
+tests/.bats-battery/*/.github
 #+end_src
 ** ../.fossil-settings/crlf-glob
 :PROPERTIES:
 :CUSTOM_ID: ----fossil-settings-crlf-glob
 :END:
 #+begin_src sh :shebang ""
-  *
+*
 #+end_src
 ** ../.github/workflows/on-push.yaml :code:
 :PROPERTIES:
 :CUSTOM_ID: ----github-workflows-on-push-yaml
 :END:
 #+begin_src yaml :shebang ""
-  name: Build and push docker images
+name: Build and push docker images
 
-  on:
-    push:
-      branches:
-        - master
-        - main
-      paths:
-        - '.github/workflows/*'
-        - '.github/*'
-        - 'src/Dockerfile*'
-        - 'src/rootfs/*'
-        - 'src/hook/*'
-        - 'src/VERSIONS'
-        - 'src/*.sh'
-        - 'src/VERSIONS'
-        - 'tests/**'
-    pull_request:
-      branches:
-        - master
-        - main
-      paths:
-        - '.github/workflows/*'
-        - '.github/*'
-        - 'src/Dockerfile'
-        - 'src/rootfs/*'
-        - 'src/hook/*'
-        - 'src/*.sh'
-        - 'src/VERSIONS'
-        - 'tests/**'
+on:
+  push:
+    branches:
+      - master
+      - main
+    paths:
+      - '.github/workflows/*'
+      - '.github/*'
+      - 'src/Dockerfile*'
+      - 'src/rootfs/*'
+      - 'src/hook/*'
+      - 'src/VERSIONS'
+      - 'src/*.sh'
+      - 'src/VERSIONS'
+      - 'tests/**'
+  pull_request:
+    branches:
+      - master
+      - main
+    paths:
+      - '.github/workflows/*'
+      - '.github/*'
+      - 'src/Dockerfile'
+      - 'src/rootfs/*'
+      - 'src/hook/*'
+      - 'src/*.sh'
+      - 'src/VERSIONS'
+      - 'tests/**'
 
-  jobs:
-    build:
-      name: Build and push image to dockerhub
-      runs-on: ubuntu-latest
-      steps:
-        - name: Repo checkout
-          uses: actions/checkout@v2
+jobs:
+  build:
+    name: Build and push image to dockerhub
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Repo checkout
+        uses: actions/checkout@v2
 
-        - name: Login to DockerHub Registry
-          run: |
-            echo  ${{ secrets.DOCKERHUB_TOKEN }} | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+      - name: Login to DockerHub Registry
+        run: |
+          echo  ${{ secrets.DOCKERHUB_TOKEN }} | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
-        - name: s6v3. Build and push images
-          run: |
-            cd ${GITHUB_WORKSPACE}/src/hook
-            ./build.sh
-            ./push.sh
-
-        - name: s6v2. Build and push images
-          run: |
-            cd ${GITHUB_WORKSPACE}/src/hook
-            export S6_OVERLAY_VERSION='2.2.0.3'
-            export S6_OVERLAY_IMAGE_TAG='2.2.0.3'
-            export DOCKERFILE='Dockerfile.s6v2'
-            ./build.sh
-            ./push.sh
+      - name: Build and push images
+        run: |
+          cd ${GITHUB_WORKSPACE}/src/hook
+          ./build.sh
+          ./push.sh
 #+end_src
 
 ** ../.github/workflows/test.yaml :code:
@@ -275,105 +282,83 @@ docker exec -it ubuntu-s6 /bin/bash
 :CUSTOM_ID: ----github-workflows-test-yaml
 :END:
 #+begin_src yaml :shebang ""
-  name: Check and Tests
+name: Check and Tests
 
-  # * Controls
-  # Controls when the action will run.
-  on:
-    push:
-      paths:
-        - '.github/workflows/*'
-        - '.github/*'
-        - 'src/Dockerfile*'
-        - 'src/rootfs/*'
-        - 'src/hook/*'
-        - 'src/*.sh'
-        - 'src/VERSIONS'
-        - 'tests/**'
-      branches-ignore:
-        - 'master'
-        - 'main'
-    pull_request:
-      paths:
-        - '.github/workflows/*'
-        - '.github/*'
-        - 'src/Dockerfile*'
-        - 'src/rootfs/*'
-        - 'src/hook/*'
-        - 'src/*.sh'
-        - 'src/VERSIONS'
-        - 'tests/**'
-      branches-ignore:
-        - 'master'
-        - 'main'
-    workflow_dispatch:
+# * Controls
+# Controls when the action will run.
+on:
+  push:
+    paths:
+      - '.github/workflows/*'
+      - '.github/*'
+      - 'src/Dockerfile*'
+      - 'src/rootfs/*'
+      - 'src/hook/*'
+      - 'src/*.sh'
+      - 'src/VERSIONS'
+      - 'tests/**'
+    branches-ignore:
+      - 'master'
+      - 'main'
+  pull_request:
+    paths:
+      - '.github/workflows/*'
+      - '.github/*'
+      - 'src/Dockerfile*'
+      - 'src/rootfs/*'
+      - 'src/hook/*'
+      - 'src/*.sh'
+      - 'src/VERSIONS'
+      - 'tests/**'
+    branches-ignore:
+      - 'master'
+      - 'main'
+  workflow_dispatch:
 
-  # * Jobs
-  jobs:
-    checks:
-      name: Checks and Tests
-      runs-on: ubuntu-20.04
-      steps:
-        - name: Repo checkout
-          uses: actions/checkout@v2
+# * Jobs
+jobs:
+  checks:
+    name: Checks and Tests
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Repo checkout
+        uses: actions/checkout@v2
 
-        - name: Check shell files (shellcheck)
-          run: |
-            sudo apt-get update -y
-            sudo apt-get install shellcheck
-            cd ${GITHUB_WORKSPACE}/tests
-            .bats-battery/bats-core/bin/bats 01.shellchecks.bats
+      - name: Check shell files (shellcheck)
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install shellcheck
+          cd ${GITHUB_WORKSPACE}/tests
+          .bats-battery/bats-core/bin/bats 01.shellchecks.bats
 
-        - name: Check Dockerfile (hadolint)
-          run: |
-            cd ${GITHUB_WORKSPACE}/tests
-            echo "::group::Check Dockerfile"
-            .bats-battery/bats-core/bin/bats 02.dockerfile_check.bats
-            echo "::endgroup::"
+      - name: Check Dockerfile (hadolint)
+        run: |
+          cd ${GITHUB_WORKSPACE}/tests
+          echo "::group::Check Dockerfile"
+          .bats-battery/bats-core/bin/bats 02.dockerfile_check.bats
+          echo "::endgroup::"
 
-            echo "::group::Check Dockerfile.s6v2"
-            export DOCKERFILE='Dockerfile.s6v2'
-            .bats-battery/bats-core/bin/bats 02.dockerfile_check.bats
-            echo "::endgroup::"
+          echo "::group::Check Dockerfile.s6v2"
+          export DOCKERFILE='Dockerfile.s6v2'
+          .bats-battery/bats-core/bin/bats 02.dockerfile_check.bats
+          echo "::endgroup::"
 
-        - name: s6v3. Build and check image and container.
-          run: |
-            echo "::group::Build image"
-            set -a; source ${GITHUB_WORKSPACE}/src/VERSIONS ; set +a;
-            export IMAGE="${IMAGE:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}}"
-            echo "Build image"
-            cd ${GITHUB_WORKSPACE}/src/hook
-            ./build.sh
-            echo "::endgroup::"
-            echo "::group::Check image and container"
-            cd ${GITHUB_WORKSPACE}/tests
-            echo "Check docker image (dockle)"
-            .bats-battery/bats-core/bin/bats 03.docker_image_check.bats
-            echo "Check docker container"
-            .bats-battery/bats-core/bin/bats 04.container_check.bats
-            echo "::endgroup::"
-
-        - name: s6v2. Build and check image and container.
-          run: |
-            echo "::group::Build image"
-            export S6_OVERLAY_VERSION='2.2.0.3'
-            export S6_OVERLAY_IMAGE_TAG='2.2.0.3'
-            export DOCKERFILE='Dockerfile.s6v2'
-
-            set -a; source ${GITHUB_WORKSPACE}/src/VERSIONS ; set +a;
-            export IMAGE="${IMAGE:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}}"
-            echo "Build image"
-            cd ${GITHUB_WORKSPACE}/src/hook
-            ./build.sh
-            echo "::endgroup::"
-
-            echo "::group::Check image and container"
-            cd ${GITHUB_WORKSPACE}/tests
-            echo "Check docker image (dockle)"
-            .bats-battery/bats-core/bin/bats 03.docker_image_check.bats
-            echo "Check docker container"
-            .bats-battery/bats-core/bin/bats 04.container_check.bats
-            echo "::endgroup::"
+      - name: Build and check image and container.
+        run: |
+          echo "::group::Build image"
+          set -a; source ${GITHUB_WORKSPACE}/src/VERSIONS ; set +a;
+          export IMAGE="${IMAGE:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}}"
+          echo "Build image"
+          cd ${GITHUB_WORKSPACE}/src/hook
+          ./build.sh
+          echo "::endgroup::"
+          echo "::group::Check image and container"
+          cd ${GITHUB_WORKSPACE}/tests
+          echo "Check docker image (dockle)"
+          .bats-battery/bats-core/bin/bats 03.docker_image_check.bats
+          echo "Check docker container"
+          .bats-battery/bats-core/bin/bats 04.container_check.bats
+          echo "::endgroup::"
 #+end_src
 
 ** ../.github/.trigger_on_push :code:
@@ -381,156 +366,121 @@ docker exec -it ubuntu-s6 /bin/bash
 :CUSTOM_ID: ----github--trigger-on-push
 :END:
 #+begin_src sh :shebang ""
-  Trigger:5
+Trigger:5
 #+end_src
 ** ../.gitignore :code:
 :PROPERTIES:
 :CUSTOM_ID: ----gitignore
 :END:
 #+begin_src sh :shebang ""
-  .fslckout
-  .projectile
-  .fossil-settings/*
+.fslckout
+.projectile
+.fossil-settings/*
 #+end_src
 ** Dockerfile :code:
 :PROPERTIES:
 :CUSTOM_ID: dockerfile
 :END:
 #+begin_src sh :shebang ""
-  # syntax=docker/dockerfile:1.4
+# syntax=docker/dockerfile:1.4
 
-  # * Base image
-  ARG UBUNTU_VERSION="${UBUNTU_VERSION}"
-  FROM ubuntu:${UBUNTU_VERSION}
+# * Base image
+ARG UBUNTU_VERSION="${UBUNTU_VERSION}"
+FROM ubuntu:${UBUNTU_VERSION}
 
-  # * Arguments
-  ARG S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION}" \
-      BUILD_DATE="${BUILD_DATE}"
+# * Arguments
+ARG S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION}" \
+    BUILD_DATE="${BUILD_DATE}" \
+    UBUNTU_VERSION="${UBUNTU_VERSION}"
 
-  # * Labels
-  LABEL \
-      maintainer="Oupfiz V <oupfiz5@yandex.ru>" \
-      org.opencontainers.image.created="${BUILD_DATE}" \
-      org.opencontainers.image.authors="Oupfiz V (Five)" \
-      org.opencontainers.image.url="https://chiselapp.com/user/oupfiz5/repository/ubuntu-s6/home" \
-      org.opencontainers.image.documentation="https://chiselapp.com/user/oupfiz5/repository/ubuntu-s6/wiki" \
-      org.opencontainers.image.source="https://chiselapp.com/user/oupfiz5/repository/ubuntu-s6/brlist" \
-      org.opencontainers.image.version="0.0.5d" \
-      org.opencontainers.image.revision="" \
-      org.opencontainers.image.vendor="" \
-      org.opencontainers.image.licenses="" \
-      org.opencontainers.image.ref.name="" \
-      org.opencontainers.image.title="Ubuntu image with s6 init system" \
-      org.opencontainers.image.description="Ubuntu base docker image using s6-overlay" \
-      org.opencontainers.ubuntu.version="${UBUNTU_VERSION}" \
-      org.opencontainers.s6overlay.version="${S6_OVERLAY_VERSION}"
+# * Labels
+LABEL \
+    maintainer="Oupfiz V <oupfiz5@yandex.ru>" \
+    org.opencontainers.image.created="${BUILD_DATE}" \
+    org.opencontainers.image.authors="Oupfiz V (Five)" \
+    org.opencontainers.image.url="https://chiselapp.com/user/oupfiz5/repository/ubuntu-s6/home" \
+    org.opencontainers.image.documentation="https://chiselapp.com/user/oupfiz5/repository/ubuntu-s6/wiki" \
+    org.opencontainers.image.source="https://chiselapp.com/user/oupfiz5/repository/ubuntu-s6/brlist" \
+    org.opencontainers.image.version="0.0.6d" \
+    org.opencontainers.image.revision="" \
+    org.opencontainers.image.vendor="" \
+    org.opencontainers.image.licenses="" \
+    org.opencontainers.image.ref.name="" \
+    org.opencontainers.image.title="Ubuntu image with s6 init system" \
+    org.opencontainers.image.description="Ubuntu base docker image using s6-overlay" \
+    org.opencontainers.ubuntu.version="${UBUNTU_VERSION}" \
+    org.opencontainers.s6overlay.version="${S6_OVERLAY_VERSION}"
 
-  # * Environment
+# * Environment
 
-  # * Copy
-  COPY rootfs/ /
+# * Copy
+COPY rootfs/ /
 
-  # * Add
-  ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz /tmp
-  ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64.tar.xz /tmp
-  ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-symlinks-noarch.tar.xz /tmp
-  ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-symlinks-arch.tar.xz /tmp
-
-
-  # * Run
-  # hadolint ignore=DL3008,DL3003
-  RUN apt-get update && \
-      DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata xz-utils --no-install-recommends && \
-      apt-get clean && \
-      rm -rf /var/lib/apt/lists/* && \
-      cd /tmp && \
-      tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz && \
-      tar -C / -Jxpf /tmp/s6-overlay-x86_64.tar.xz && \
-      tar -C / -Jxpf /tmp/s6-overlay-symlinks-noarch.tar.xz && \
-      tar -C / -Jxpf /tmp/s6-overlay-symlinks-arch.tar.xz && \
-      rm /tmp/s6-overlay-noarch.tar.xz && \
-      rm /tmp/s6-overlay-x86_64.tar.xz && \
-      rm /tmp/s6-overlay-symlinks-noarch.tar.xz && \
-      rm /tmp/s6-overlay-symlinks-arch.tar.xz
+# * Add
+ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz /tmp
+ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64.tar.xz /tmp
+ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-symlinks-noarch.tar.xz /tmp
+ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-symlinks-arch.tar.xz /tmp
 
 
-  # * Entrypoint
-  ENTRYPOINT ["/init"]
-#+end_src
-** Dockerfile.s6v2 :code:
-:PROPERTIES:
-:CUSTOM_ID: dockerfile-s6v2
-:END:
-#+begin_src sh :shebang ""
-  # syntax=docker/dockerfile:1.4
+# * Run
+# hadolint ignore=DL3008,DL3003
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata xz-utils --no-install-recommends && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    cd /tmp && \
+    tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz && \
+    tar -C / -Jxpf /tmp/s6-overlay-x86_64.tar.xz && \
+    tar -C / -Jxpf /tmp/s6-overlay-symlinks-noarch.tar.xz && \
+    tar -C / -Jxpf /tmp/s6-overlay-symlinks-arch.tar.xz && \
+    rm /tmp/s6-overlay-noarch.tar.xz && \
+    rm /tmp/s6-overlay-x86_64.tar.xz && \
+    rm /tmp/s6-overlay-symlinks-noarch.tar.xz && \
+    rm /tmp/s6-overlay-symlinks-arch.tar.xz
 
-  # * Base image
-  ARG UBUNTU_VERSION="${UBUNTU_VERSION}"
-  FROM ubuntu:${UBUNTU_VERSION}
 
-  # * Arguments
-  ARG S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION}" \
-      BUILD_DATE="${BUILD_DATE}"
-
-  # * Labels
-  LABEL \
-      maintainer="Oupfiz V <oupfiz5@yandex.ru>" \
-      org.opencontainers.image.created="${BUILD_DATE}" \
-      org.opencontainers.image.authors="Oupfiz V (Five)" \
-      org.opencontainers.image.url="https://chiselapp.com/user/oupfiz5/repository/ubuntu-s6/home" \
-      org.opencontainers.image.documentation="https://chiselapp.com/user/oupfiz5/repository/ubuntu-s6/wiki" \
-      org.opencontainers.image.source="https://chiselapp.com/user/oupfiz5/repository/ubuntu-s6/brlist" \
-      org.opencontainers.image.version="0.0.4d" \
-      org.opencontainers.image.revision="" \
-      org.opencontainers.image.vendor="" \
-      org.opencontainers.image.licenses="" \
-      org.opencontainers.image.ref.name="" \
-      org.opencontainers.image.title="Ubuntu image with s6 init system" \
-      org.opencontainers.image.description="Ubuntu base docker image using s6-overlay" \
-      org.opencontainers.ubuntu.version="${UBUNTU_VERSION}" \
-      org.opencontainers.s6overlay.version="${S6_OVERLAY_VERSION}"
-
-  # * Environment
-
-  # * Copy
-  COPY rootfs/ /
-
-  # * Add
-  ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-amd64.tar.gz /tmp/s6-overlay.tar.gz
-
-  # * Run
-  # hadolint ignore=DL3008,DL3003
-  RUN apt-get update && \
-      DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata --no-install-recommends && \
-      apt-get clean && \
-      rm -rf /var/lib/apt/lists/* && \
-      cd /tmp && \
-      tar xzf /tmp/s6-overlay.tar.gz -C / --exclude='./bin' && \
-      tar xzf /tmp/s6-overlay.tar.gz -C /usr ./bin && \
-      rm /tmp/s6-overlay.tar.gz
-
-  # * Entrypoint
-  ENTRYPOINT ["/init"]
+# * Entrypoint
+ENTRYPOINT ["/init"]
 #+end_src
 ** hook/build.sh :code:
 :PROPERTIES:
 :CUSTOM_ID: hook-build-sh
 :END:
 #+begin_src sh  :results output pp :noweb strip-export :dir ../src/hook
-  # shellcheck disable=SC1091
-  set -a; source ../VERSIONS ; set +a;
+# shellcheck disable=SC1091
+set -a; source ../VERSIONS ; set +a;
 
-  IMAGE="${IMAGE:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}}"
-  DOCKERFILE="${DOCKERFILE:-Dockerfile}"
+IMAGE="${IMAGE:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}}"
+IMAGE_LATEST="${IMAGE_LATEST:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:latest}"
+DOCKERFILE="${DOCKERFILE:-Dockerfile}"
 
-  docker buildx build \
-         --build-arg BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
-         --build-arg S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION}" \
-         --build-arg UBUNTU_VERSION="${UBUNTU_VERSION}" \
-         -t "${IMAGE}" \
-         -f ../"${DOCKERFILE}" \
-          ../.
+docker buildx build \
+    --build-arg BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+    --build-arg S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION}" \
+    --build-arg UBUNTU_VERSION="${UBUNTU_VERSION}" \
+    --tag "${IMAGE}" \
+    --file ../"${DOCKERFILE}" \
+    --tag "${IMAGE_LATEST}" \
+    ../.
+#+end_src
 
+** hook/push.sh :code:notangle:
+:PROPERTIES:
+:CUSTOM_ID: hook-push-sh
+:END:
+#+begin_src sh :results output pp :noweb strip-export :dir ../src/hook :tangle no
+# shellcheck disable=SC1091
+set -a; source ../VERSIONS ; set +a;
+
+# * Push docker images using full tag
+IMAGE="${IMAGE:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}}"
+IMAGE_LATEST="${IMAGE_LATEST:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:latest}"
+docker push "${IMAGE}" "${IMAGE_LATEST}"
+
+# * Push docker images using latest tag
+IMAGE="${IMAGE_REPOSITORY}/${IMAGE_NAME}:latest"
+docker push "${IMAGE}"
 #+end_src
 
 ** hook/push.sh :code:
@@ -538,12 +488,17 @@ docker exec -it ubuntu-s6 /bin/bash
 :CUSTOM_ID: hook-push-sh
 :END:
 #+begin_src sh :results output pp :noweb strip-export :dir ../src/hook
-  # shellcheck disable=SC1091
-  set -a; source ../VERSIONS ; set +a;
+# shellcheck disable=SC1091
+set -a; source ../VERSIONS ; set +a;
 
-  IMAGE="${IMAGE:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}}"
+# * Push docker images
+IMAGE="${IMAGE:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}}"
+IMAGE_LATEST="${IMAGE_LATEST:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:latest}"
 
-  docker push "${IMAGE}"
+docker image tag "${IMAGE}" "${IMAGE}"
+docker image tag "${IMAGE}" "${IMAGE_LATEST}"
+docker image push "${IMAGE}"
+docker image push "${IMAGE_LATEST}"
 #+end_src
 
 ** rootfs/etc/cont-finish.d/.gitignore :code:notangle:
@@ -559,24 +514,24 @@ docker exec -it ubuntu-s6 /bin/bash
 :CUSTOM_ID: rootfs-etc-cont-init-d-00-settimezone-sh
 :END:
 #+begin_src with-contenv :tangle-mode (identity #o755)
-  # shellcheck shell=sh
+# shellcheck shell=sh
 
-  set -e
+set -e
 
-  # * User parameters
-  TIMEZONE=${TZ:="UTC"}
+# * User parameters
+TIMEZONE=${TZ:="UTC"}
 
-  TZFILE="../usr/share/zoneinfo/${TIMEZONE}"
+TZFILE="../usr/share/zoneinfo/${TIMEZONE}"
 
-  # * Work from the /etc directory
-  cd /etc
+# * Work from the /etc directory
+cd /etc
 
-  if [ -f ${TZFILE} ]; then  # Make sure the file exists
-     echo "Setting timezone to ${TIMEZONE}"
-     ln -sf ${TZFILE} localtime  # Set the timezone
-  else
-     echo "Timezone: ${TIMEZONE} not found, skipping"
-  fi
+if [ -f ${TZFILE} ]; then  # Make sure the file exists
+    echo "Setting timezone to ${TIMEZONE}"
+    ln -sf ${TZFILE} localtime  # Set the timezone
+else
+    echo "Timezone: ${TIMEZONE} not found, skipping"
+fi
 #+end_src
 
 ** rootfs/etc/fix-attrs.d/.gitignore :code:notangle:
@@ -604,29 +559,28 @@ docker exec -it ubuntu-s6 /bin/bash
 :CUSTOM_ID: 01-shellchecks-bats
 :END:
 #+begin_src bats :results output pp :noweb strip-export
+setup() {
+    targets=()
+    while IFS=  read -r -d $'\0'; do
+        targets+=("$REPLY")
+    done < <(
+        find \
+            ../src/rootfs/etc \
+            ../src/hook \
+            -type f \
+            -print0
+    )
+}
 
-  setup() {
-      targets=()
-      while IFS=  read -r -d $'\0'; do
-          targets+=("$REPLY")
-      done < <(
-          find \
-              ../src/rootfs/etc \
-              ../src/hook \
-              -type f \
-              -print0
-      )
-  }
+@test "Check shell files" {
+    run export LC_ALL=C.UTF-8; shellcheck "${targets[@]}"
+    assert_success
+}
 
-  @test "Check shell files" {
-        run export LC_ALL=C.UTF-8; shellcheck "${targets[@]}"
-        assert_success
-  }
-
-  @test "Check VERSIONS file" {
-        run export LC_ALL=C.UTF-8; shellcheck --shell=sh --exclude=SC2034 ../src/VERSIONS
-        assert_success
-  }
+@test "Check VERSIONS file" {
+    run export LC_ALL=C.UTF-8; shellcheck --shell=sh --exclude=SC2034 ../src/VERSIONS
+    assert_success
+}
 
 #+end_src
 
@@ -635,14 +589,14 @@ docker exec -it ubuntu-s6 /bin/bash
 :CUSTOM_ID: 02-dockerfile-check-bats
 :END:
 #+begin_src bats :results output pp :noweb strip-export
-  setup() {
-     DOCKERFILE="${DOCKERFILE:-Dockerfile}"
-  }
+setup() {
+   DOCKERFILE="${DOCKERFILE:-Dockerfile}"
+}
 
-  @test "Check Dockerfile" {
-        run docker run --rm -i -v "${PWD}/../src":/work --workdir=/work  hadolint/hadolint hadolint -f json "${DOCKERFILE}"
-        assert_success
-  }
+@test "Check Dockerfile" {
+      run docker run --rm -i -v "${PWD}/../src":/work --workdir=/work  hadolint/hadolint hadolint -f json "${DOCKERFILE}"
+      assert_success
+}
 
 #+end_src
 
@@ -653,27 +607,27 @@ docker exec -it ubuntu-s6 /bin/bash
 
 #+begin_src bats :results output pp :noweb strip-export
 
-  setup() {
-        . ../src/VERSIONS
-        IMAGE="${IMAGE:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}}"
+setup() {
+      . ../src/VERSIONS
+      IMAGE="${IMAGE:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}}"
 
-        VERSION=$(
-        curl --silent "https://api.github.com/repos/goodwithtech/dockle/releases/latest" | \
-            grep '"tag_name":' | \
-            sed -E 's/.*"v([^"]+)".*/\1/' \
-        )
-    }
+      VERSION=$(
+      curl --silent "https://api.github.com/repos/goodwithtech/dockle/releases/latest" | \
+          grep '"tag_name":' | \
+          sed -E 's/.*"v([^"]+)".*/\1/' \
+      )
+  }
 
-  @test "Check docker image" {
-      run docker run --rm \
-          -v /var/run/docker.sock:/var/run/docker.sock \
-          -v "$(pwd)"/.dockleignore:/.dockleignore \
-          goodwithtech/dockle:v"${VERSION}" \
-          --exit-code 1 \
-          --exit-level fatal \
-          "${IMAGE}"
-      assert_success
-    }
+@test "Check docker image" {
+    run docker run --rm \
+        -v /var/run/docker.sock:/var/run/docker.sock \
+        -v "$(pwd)"/.dockleignore:/.dockleignore \
+        goodwithtech/dockle:v"${VERSION}" \
+        --exit-code 1 \
+        --exit-level fatal \
+        "${IMAGE}"
+    assert_success
+  }
 #+end_src
 
 ** 04.container_check.bats :test:
@@ -682,60 +636,60 @@ docker exec -it ubuntu-s6 /bin/bash
 :END:
 #+begin_src bats :results output pp :noweb strip-export
 
-  setup() {
-      . ../src/VERSIONS
-      IMAGE="${IMAGE:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}}"
-  }
+setup() {
+    . ../src/VERSIONS
+    IMAGE="${IMAGE:-${IMAGE_REPOSITORY}/${IMAGE_NAME}:${IMAGE_TAG}}"
+}
 
-  @test "Verify container run" {
-        run docker run -d --rm --name="${CONTAINER_NAME}" "${IMAGE}"
-        assert_success
-  }
+@test "Verify container run" {
+      run docker run -d --rm --name="${CONTAINER_NAME}" "${IMAGE}"
+      assert_success
+}
 
-  @test "Verify state status container - running" {
-        sleep 5
-        run docker inspect --format 'result={{ .State.Status }}' "${CONTAINER_NAME}"
-        assert_success
-        assert_output 'result=running'
-  }
+@test "Verify state status container - running" {
+      sleep 5
+      run docker inspect --format 'result={{ .State.Status }}' "${CONTAINER_NAME}"
+      assert_success
+      assert_output 'result=running'
+}
 
-  @test "Verify state running container - true" {
-        run docker inspect --format 'result={{ .State.Running }}' "${CONTAINER_NAME}"
-        assert_success
-        assert_output 'result=true'
-  }
+@test "Verify state running container - true" {
+      run docker inspect --format 'result={{ .State.Running }}' "${CONTAINER_NAME}"
+      assert_success
+      assert_output 'result=true'
+}
 
-  @test "Verify state restarting container - false" {
-        run docker inspect --format 'result={{ .State.Restarting }}' "${CONTAINER_NAME}"
-        assert_success
-        assert_output 'result=false'
-  }
+@test "Verify state restarting container - false" {
+      run docker inspect --format 'result={{ .State.Restarting }}' "${CONTAINER_NAME}"
+      assert_success
+      assert_output 'result=false'
+}
 
-  @test "Verify state error container - <empty>" {
-        run docker inspect --format 'result={{ .State.Error }}' "${CONTAINER_NAME}"
-        assert_success
-        assert_output 'result='
-  }
+@test "Verify state error container - <empty>" {
+      run docker inspect --format 'result={{ .State.Error }}' "${CONTAINER_NAME}"
+      assert_success
+      assert_output 'result='
+}
 
-  @test "Verify restart count container - 0" {
-        run docker inspect --format 'result={{ .RestartCount }}' "${CONTAINER_NAME}"
-        assert_success
-        assert_output 'result=0'
-  }
+@test "Verify restart count container - 0" {
+      run docker inspect --format 'result={{ .RestartCount }}' "${CONTAINER_NAME}"
+      assert_success
+      assert_output 'result=0'
+}
 
-  # @test "Verify AppArmor Profile - if applicable" {
-  #       skip
-  #       run docker inspect --format 'AppArmorProfile={{ .AppArmorProfile }}' "${CONTAINER_NAME}"
-  #       assert_success
-  #       refute_output "AppArmorProfile=[]"
-  #       refute_output "AppArmorProfile="
-  #       refute_output "AppArmorProfile=<no value>"
-  # }
+# @test "Verify AppArmor Profile - if applicable" {
+#       skip
+#       run docker inspect --format 'AppArmorProfile={{ .AppArmorProfile }}' "${CONTAINER_NAME}"
+#       assert_success
+#       refute_output "AppArmorProfile=[]"
+#       refute_output "AppArmorProfile="
+#       refute_output "AppArmorProfile=<no value>"
+# }
 
-  @test "Verify container stop" {
-        run docker container stop "${CONTAINER_NAME}"
-        assert_success
-  }
+@test "Verify container stop" {
+      run docker container stop "${CONTAINER_NAME}"
+      assert_success
+}
 
 #+end_src
 
@@ -744,29 +698,29 @@ docker exec -it ubuntu-s6 /bin/bash
 :CUSTOM_ID: shellcheck-sh
 :END:
 #+begin_src sh :results output pp :noweb strip-export :tangle no
-  set -e
+set -e
 
-  targets=()
-  while IFS=  read -r -d $'\0'; do
-      targets+=("$REPLY")
-  done < <(
-    find \
-      ../src/rootfs/etc \
-      ../src/hook \
-      -type f \
-      -print0
-    )
+targets=()
+while IFS=  read -r -d $'\0'; do
+    targets+=("$REPLY")
+done < <(
+  find \
+    ../src/rootfs/etc \
+    ../src/hook \
+    -type f \
+    -print0
+  )
 
 
-  echo "Shellcheck files"
-  LC_ALL=C.UTF-8 shellcheck "${targets[@]}"
+echo "Shellcheck files"
+LC_ALL=C.UTF-8 shellcheck "${targets[@]}"
 
-  # VERSION were exclude from main check (above)
-  # exclude warning https://github.com/koalaman/shellcheck/wiki/SC2034
-  echo "Shellcheck VERSION"
-  #LC_ALL=C.UTF-8 shellcheck --shell=sh --exclude=SC2034 VERSION
+# VERSION were exclude from main check (above)
+# exclude warning https://github.com/koalaman/shellcheck/wiki/SC2034
+echo "Shellcheck VERSION"
+#LC_ALL=C.UTF-8 shellcheck --shell=sh --exclude=SC2034 VERSION
 
-  exit $?
+exit $?
 #+end_src
 
 ** docker_image_check.sh :test:noexport:notangle:
@@ -774,23 +728,23 @@ docker exec -it ubuntu-s6 /bin/bash
 :CUSTOM_ID: docker-image-check-sh
 :END:
 #+begin_src sh :results output pp :noweb strip-export :tangle no
-  set -e
-  IMAGE_NAME="${1:-oupfiz5/ubuntu-s6:latest}"
+set -e
+IMAGE_NAME="${1:-oupfiz5/ubuntu-s6:latest}"
 
-  # * Install dockle and check targets
-  # Pay attention: some checks are ignored using .dockleignore
-  VERSION=$(
-      curl --silent "https://api.github.com/repos/goodwithtech/dockle/releases/latest" | \
-          grep '"tag_name":' | \
-          sed -E 's/.*"v([^"]+)".*/\1/' \
-         ) && docker run --rm \
-                         -v /var/run/docker.sock:/var/run/docker.sock \
-                         -v "$(pwd)"/.dockleignore:/.dockleignore \
-                         goodwithtech/dockle:v"${VERSION}" \
-                         --exit-code 1 \
-                         --exit-level fatal \
-                         "${IMAGE_NAME}"
-  exit $?
+# * Install dockle and check targets
+# Pay attention: some checks are ignored using .dockleignore
+VERSION=$(
+    curl --silent "https://api.github.com/repos/goodwithtech/dockle/releases/latest" | \
+        grep '"tag_name":' | \
+        sed -E 's/.*"v([^"]+)".*/\1/' \
+        ) && docker run --rm \
+          -v /var/run/docker.sock:/var/run/docker.sock \
+          -v "$(pwd)"/.dockleignore:/.dockleignore \
+          goodwithtech/dockle:v"${VERSION}" \
+          --exit-code 1 \
+          --exit-level fatal \
+          "${IMAGE_NAME}"
+exit $?
 #+end_src
 
 ** .dockleignore :test:
@@ -810,24 +764,24 @@ CIS-DI-0001
 :CUSTOM_ID: dockerfile-check-sh
 :END:
 #+begin_src sh :results output pp :noweb strip-export :tangle no
-    set -e
+set -e
 
-    # * Get list of targets
-    targets=()
-    while IFS=  read -r -d $'\0'; do
-        targets+=("$REPLY")
-    done < <(
-      find \
-         ../src/Dockerfile \
+# * Get list of targets
+targets=()
+while IFS=  read -r -d $'\0'; do
+    targets+=("$REPLY")
+done < <(
+    find \
+        ../src/Dockerfile \
         -type f \
         -print0
-      )
+)
 
-    # * Pull hadolint and check targets
-    echo Test Dockerfile
-    docker run --rm -i hadolint/hadolint < "${targets[@]}" && echo "Success"
+# * Pull hadolint and check targets
+echo Test Dockerfile
+docker run --rm -i hadolint/hadolint < "${targets[@]}" && echo "Success"
 
-    exit $?
+exit $?
 #+end_src
 
 * TODO Next steps :noexport:notangle:

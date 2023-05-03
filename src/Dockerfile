@@ -6,7 +6,8 @@ FROM ubuntu:${UBUNTU_VERSION}
 
 # * Arguments
 ARG S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION}" \
-    BUILD_DATE="${BUILD_DATE}"
+    BUILD_DATE="${BUILD_DATE}" \
+    UBUNTU_VERSION="${UBUNTU_VERSION}"
 
 # * Labels
 LABEL \
@@ -16,7 +17,7 @@ LABEL \
     org.opencontainers.image.url="https://chiselapp.com/user/oupfiz5/repository/ubuntu-s6/home" \
     org.opencontainers.image.documentation="https://chiselapp.com/user/oupfiz5/repository/ubuntu-s6/wiki" \
     org.opencontainers.image.source="https://chiselapp.com/user/oupfiz5/repository/ubuntu-s6/brlist" \
-    org.opencontainers.image.version="0.0.5d" \
+    org.opencontainers.image.version="0.0.6d" \
     org.opencontainers.image.revision="" \
     org.opencontainers.image.vendor="" \
     org.opencontainers.image.licenses="" \

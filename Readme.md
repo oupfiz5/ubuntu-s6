@@ -1,3 +1,4 @@
+
 # Table of Contents
 
 -   [About](#about)
@@ -22,7 +23,7 @@
 
 # About
 
-This is [ubuntu base docker image](https://hub.docker.com/_/ubuntu) (version 20.04) using [s6-overlay](https://github.com/just-containers/s6-overlay).
+This is [ubuntu base docker image](https://hub.docker.com/_/ubuntu) (version 22.04) using [s6-overlay](https://github.com/just-containers/s6-overlay).
 
 Ubuntu-s6 is self-hosting at <https://chiselapp.com/user/oupfiz5/repository/ubuntu-s6>.
 
@@ -67,7 +68,7 @@ They are using for testing and scanning:
 
 ## Download from dockerhub
 
-    docker pull oupfiz5/ubuntu-s6:20.04-3.1.0.0
+    docker pull oupfiz5/ubuntu-s6:22.04-3.1.4.2
 
 
 <a id="build-from-chiselapp--fossil-"></a>
@@ -131,13 +132,12 @@ They are using for testing and scanning:
 
 ## Timezone
 
-Set the timezone for the container, defaults to UTC. To set the
-timezone set the desired timezone with the variable TZ.
+Set the timezone for the container, defaults to UTC. To set the timezone set the desired timezone with the variable TZ.
 
     docker run -itd --restart always \
                --name ubuntu-s6  \
                --env 'TZ=Europe/Moscow' \
-               oupfiz5/ubuntu-s6:20.04-3.1.0.0
+               oupfiz5/ubuntu-s6:22.04-3.1.4.2
 
 
 <a id="continues-integration"></a>
@@ -160,7 +160,7 @@ For debugging and maintenance purposes you may want access the output log. If yo
 
     docker run -it --rm \
            --name=ubuntu-s6 \
-           oupfiz5/ubuntu-s6:20.04-3.1.0.0
+           oupfiz5/ubuntu-s6:22.04-3.1.4.2
 
 
 <a id="shell-access"></a>
@@ -170,3 +170,4 @@ For debugging and maintenance purposes you may want access the output log. If yo
 For debugging and maintenance purposes you may want access the containers shell. If you are using Docker version 1.3.0 or higher you can access a running containers shell by starting bash using docker exec:
 
     docker exec -it ubuntu-s6 /bin/bash
+
