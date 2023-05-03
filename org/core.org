@@ -405,7 +405,8 @@ docker exec -it ubuntu-s6 /bin/bash
 
   # * Arguments
   ARG S6_OVERLAY_VERSION="${S6_OVERLAY_VERSION}" \
-      BUILD_DATE="${BUILD_DATE}"
+      BUILD_DATE="${BUILD_DATE}" \
+      UBUNTU_VERSION="${UBUNTU_VERSION}"
 
   # * Labels
   LABEL \
